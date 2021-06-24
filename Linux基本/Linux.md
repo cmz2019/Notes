@@ -460,7 +460,7 @@ Global regular expression print
 
 作用：在文件中查找字符串
 
-语法：`grep 模式 文件名列表`
+**语法**：`grep 模式 文件名列表`，注意，文件名列表中只包含一个文件时，结果不会显示文件名，只有包含多个文件才显示每个文件名
 
 **举例**
 
@@ -475,6 +475,7 @@ Global regular expression print
 + `-n` 显示时每行前面显示行号
 + `-v` 显示所有不包含模式的行
 + `-i` 字母比较时忽略字母的大小写
++ `-E` 使用扩展的正则表达式
 
 **举例**
 
@@ -1051,6 +1052,7 @@ Global regular expression print
   + 对通配符的解释由 find 完成
 + `-regex pattern`，**整个路径名**与正则表达式 pattern 匹配
 + `-type`，`f` 普通文件，`d` 目录，`l` 符号链接文件，`c` 字符设备文件，`b` 块设备文件，`p` 管道文件
++ `-maxdepth number`，指定搜索深度为 number
 + `-size ±n单位`，指定文件大小（大于+，等于，小于-），单位有 c（字符），b （块， 512 字节），k(1024)，M，G，默认为 b
 + `-mtime ±ndays`，文件最近修改时间
 + `-newer file`，文件最近修改时间比 file 的还晚
@@ -1088,9 +1090,11 @@ Global regular expression print
     `find / -size +100k \( -name core –o -name \*.tmp ')' -print`
 
 + `find /lib /usr -name 'libc*.so' -exec ls -lh {} \;`
+
   + `-exec` 及随后的分号之间的内容作为一条命令执行
   + shell 中分号有特殊含义，前面加反斜线 \\
   + `{}` 代表遍历时所查到的符合条件的路径名。注意，两花括号间无空格，之后的空格不可省略
+
 + 利用 find 的递归式遍历目录的功能在文件中搜寻字符串，`find src -name \*.c -exec grep -n -- --help {} /dev/null \;`，在目录 src 中所有 \.c 文件中查找 \-\-help 字符串
 
 ### 批量处理文件
@@ -1253,16 +1257,299 @@ Global regular expression print
 
 # 四、bash及脚本程序设计
 
+## 1、shell的基本机制
+
+### 历史与别名
+
+#### history
+
+内部命令 `history`，查看历史表（文件 `$HOME/.bash_history`）
+
+查看先前键入的命令
+
+![image-20210624092235143](https://gitee.com/cmz2000/album/raw/master/image/image-20210624092235143.png)
+
+#### 历史替换
+
+人机交互时直接使用上下箭头键
+
+`!!`，引用上一命令
+
+`! str`，以 str 开头的最近使用过的命令，如：`!v`，`!m`，`!.`
+
+#### alias
+
+![image-20210624092641493](https://gitee.com/cmz2000/album/raw/master/image/image-20210624092641493.png)
+
+#### TAB键补全
+
++ 每行的首个单词：TAB键补全搜索 `$PATH` 下的命令
++ 行中的其它单词：TAB键补全当前目录下的文件名  
+
+### 输入重定向
+
+#### <filename
+
+![image-20210624093047738](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093047738.png)
+
+#### <<word
+
+![image-20210624093128168](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093128168.png)
+
+#### <<<word
+
+![image-20210624093142677](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093142677.png)
+
+### 输出重定向与管道
+
+![image-20210624093204481](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093204481.png)
+
+#### stdout输出重定向
+
+![image-20210624093448704](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093448704.png)
+
+#### stderr输出重定向
+
+![image-20210624093515146](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093515146.png)
+
+#### 举例
+
+![image-20210624093715805](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093715805.png)
+
+![image-20210624093729828](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093729828.png)
+
+### 管道
+
+![image-20210624093804186](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093804186.png)
+
+## 2、变量
+
+### 赋值与引用
+
+![image-20210624094811543](https://gitee.com/cmz2000/album/raw/master/image/image-20210624094811543.png)
+
+![image-20210624094838149](https://gitee.com/cmz2000/album/raw/master/image/image-20210624094838149.png)
+
+## 3、替换
+
+Shell 的替换工作：**先替换命令行再执行命令**
+
+### 文件名生成
+
+![image-20210624095229462](https://gitee.com/cmz2000/album/raw/master/image/image-20210624095229462.png)
+
+### 命令替换
+
+#### 反撇号 \`
+
+![image-20210624095319370](https://gitee.com/cmz2000/album/raw/master/image/image-20210624095319370.png)
+
+#### \$\(\)格式
+
+![image-20210624095428221](https://gitee.com/cmz2000/album/raw/master/image/image-20210624095428221.png)
+
+### 位置参数
+
+![image-20210624095546592](https://gitee.com/cmz2000/album/raw/master/image/image-20210624095546592.png)
 
 
 
+## 4、元字符和转义
+
+## 5、条件
+
+条件判断的依据：判定一条命令是否执行成功。方法：命令执行的返回码，0表示成功，非0表示失败。可以把命令执行结束后的“返回码”理解为“出错代码”。
+
+### 逻辑判断
+
+#### 内部命令 \$?
+
+![image-20210624101038229](https://gitee.com/cmz2000/album/raw/master/image/image-20210624101038229.png)
+
+#### 复合逻辑
+
+![image-20210624101125811](https://gitee.com/cmz2000/album/raw/master/image/image-20210624101125811.png)
+
+### test 和 方括号命令 \[
+
++ 命令 `/usr/bin/[`，要求其最后一个命令行参数必须为 `]`
++ 除此之外 `/usr/bin/[` 与 `/usr/bin/test` 功能相同
++ 注意：不要将方括号理解成一个词法符号，而是一个名字为 `[` 的命令
++ 举例
+  `test -r /etc/motd`
+  `[ -r /etc/motd ]`
+
+#### 文件特性检测
+
+![image-20210624102226812](https://gitee.com/cmz2000/album/raw/master/image/image-20210624102226812.png)
+
+#### 比较
+
+![image-20210624102852550](https://gitee.com/cmz2000/album/raw/master/image/image-20210624102852550.png)
+
+![image-20210624103007751](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103007751.png)
+
+#### 复合条件
+
+![image-20210624103025596](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103025596.png)
+
+### 命令组合 \{\} 与 \(\)
+
+![image-20210624103226871](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103226871.png)
+
+![image-20210624103238293](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103226871.png)
+
+![image-20210624103311757](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103311757.png)
+
+### 条件分支
+
+#### if
+
+![image-20210624103423101](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103423101.png)
+
+##### 举例
+
+![image-20210624103522258](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103522258.png)
+
+#### case
+
+![image-20210624103535135](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103535135.png)
+
+## 6、循环
+
+### expr
+
+作用：算术运算、关系运算、逻辑运算、正则表达式运算
+
+![image-20210624103928490](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103928490.png)
+
+![image-20210624104327870](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104327870.png)
+
+#### 正则表达式运算
+
+![image-20210624104426585](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104406013.png)
+
+### 内部命令 eval
+
+![image-20210624104459462](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104459462.png)
+
+### while 循环
+
+![image-20210624104627820](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104627820.png)
+
+多个命令放到一行时，要用分号隔开
+
+### for 循环
+
+![image-20210624104746465](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104746465.png)
+
+## 7、函数
+
+![image-20210624104814777](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104814777.png)
+
+# 五、重定向与管道
+
+![image-20210624083231346](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083231346.png)
+
+![image-20210624083334698](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083334698.png)
+
+## 1、重定向
+
+![image-20210624083609746](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083609746.png)
+
+## 2、管道
+
+### 创建
+
+![image-20210624083737990](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083737990.png)
+
+### 写
+
+![image-20210624083756234](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083756234.png)
+
+### 读
+
+![image-20210624083816776](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083816776.png)
+
+### 关闭
+
+![image-20210624083830567](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083830567.png)
 
 
 
+### 举例
+
+![image-20210624083917476](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083917476.png)
+
+![image-20210624084104800](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084104800.png)
+
+![image-20210624084118565](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084118565.png)
+
+![image-20210624084205246](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084205246.png)
+
+## 3、一些命令
+
+### kill
+
+作用：用于向进程发送一个信号
+
+**使用方法**：`kill –signal PID-list`
+
+**举例**：
+
+![image-20210624084726950](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084726950.png)
+
+![image-20210624084811305](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084811305.png)
 
 
 
+## 4、一些系统调用
+
+### signal
+
+作用：进程对信号的处理
+
+进程对到达的信号可以在下列处理中选取一种
+
++ 设置为缺省处理方式（大部分处理是程序中止，有的会产生core文件）。
+
+  `signal(SIGINT, SIG_DFL)`，参数1为信号宏，参数2为 SIG_DFL
+
++ 信号被忽略：`signal(SIGINT,SIG_IGN)`，在执行了这个调用后，进程就不再收到 SIGINT 信号（该属性会被子进程继承）
+
++ 信号被捕捉：`signal(SIGINT,user_func)`，用户事先注册好一个函数，当信号发生后就去执行这一函数。
+
+### kill
+
+作用：发送信号
+
+**使用方法**：`int kill(int pid, int sig)`，返回值：0 成功，-1 失败
+
+![image-20210624085431899](https://gitee.com/cmz2000/album/raw/master/image/image-20210624085431899.png)
+
+# 六、进程控制
+
+## 1、一些系统调用
+
+### fork
+
+作用：创建新进程
+
+**使用方法**：`int fork()`，对父进程返回子进程的 PID (>0)，对子进程返回值为 0，失败时返回 -1
+
+### exec
+
+![image-20210624091051583](https://gitee.com/cmz2000/album/raw/master/image/image-20210624091051583.png)
+
+![image-20210624091102630](https://gitee.com/cmz2000/album/raw/master/image/image-20210624091102630.png)
+
+### wait
+
+![image-20210624091432426](https://gitee.com/cmz2000/album/raw/master/image/image-20210624091432426.png)
+
+### system
+
+![image-20210624091604961](https://gitee.com/cmz2000/album/raw/master/image/image-20210624091604961.png)
 
 
 
-未完待续......
