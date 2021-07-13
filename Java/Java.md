@@ -291,8 +291,8 @@ putstatic i 	// 将修改后的值存入静态变量i
 
 + 问题出现在多个线程共享资源的时候
 
-   + 多个线程同时对共享资源进行读操作本身也没有问题
-   + 问题出现在对对共享资源同时进行读写操作时就有问题了
+  + 多个线程同时对共享资源进行读操作本身也没有问题
+  + 问题出现在对对共享资源同时进行读写操作时就有问题了
 
 + 先定义一个叫做临界区的概念：一段代码内如果存在对共享资源的多线程读写操作，那么称这段代码为临界区，如下
 
@@ -483,7 +483,16 @@ if( table.get("key") == null) {
 }
 ```
 
-![image-20210520200918692](https://gitee.com/cmz2000/album/raw/master/image/image-20210520200918692.png)
+```mermaid
+sequenceDiagram
+participant t1 as 线程1
+participant t2 as 线程2
+participant table as table
+t1 ->> table : get("key")==null
+t2 ->> table : get("key")==null
+t1 ->> table : put("key", v1)
+t2 ->> table : put("key", v2)
+```
 
 #### 不可变类的线程安全
 
@@ -511,7 +520,7 @@ if( table.get("key") == null) {
 
 #### Monitor原理
 
-Monitor被翻译为监视器或者说管程
+Monitor被翻译为监视器或者管程
 
 每个java对象都可以关联一个Monitor，如果使用`synchronized`给对象上锁（重量级），该对象头的Mark Word中就被设置为指向Monitor对象的指针
 
@@ -1295,6 +1304,614 @@ class ParkUnpark {
    3. 同步模式之顺序控制
 
 ## 共享模型之内存
+
+### Java内存模型
+
+JMM 即 Java Memory Model，它从java层面定义了主存、工作内存抽象概念，底层对应着 CPU 寄存器、缓存、硬件内存、CPU 指令优化等。JMM 体现在以下几个方面
+
+1. 原子性 - 保证指令不会受到线程上下文切换的影响
+2. 可见性 - 保证指令不会受 cpu 缓存的影响
+3. 有序性 - 保证指令不会受 cpu 指令并行优化的影响
+
+### 可见性
+
+#### 退不出的循环
+
+先来看一个现象，main 线程对 run 变量的修改对于 t 线程不可见，导致了 t 线程无法停止：
+
+```java
+public class Main {
+    static boolean run = true;
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(() -> {
+            while (run) {
+                // running
+            }
+        });
+        t.start();
+        Thread.sleep(1000);
+        System.out.println("run stop");
+        run = false;  // 线程t不会如预想的停下来
+    }
+}
+```
+
+**原因如下**：
+
+1. 初始状态，t 线程刚开始从主内存读取了 run 的值到工作内存
+
+![image-20210630201550673](https://gitee.com/cmz2000/album/raw/master/image/image-20210630201550673.png)
+
+2. 因为 t 线程频繁地从主存中读取 run 的值，JIT 即时编译器会将 run 的值缓存至自己工作内存中的高速缓存中，减少对主存中 run 的访问，提高效率
+
+![image-20210630201742211](https://gitee.com/cmz2000/album/raw/master/image/image-20210630201742211.png)
+
+3. 一秒之后，main 线程修改了 run 的值，并同步至主存，而 t 是从自己工作内存中的高速缓存中读取这个变量 的值，结果永远是旧值
+
+![image-20210630201821132](https://gitee.com/cmz2000/album/raw/master/image/image-20210630201821132.png)
+
+#### 解决方法
+
+**volatile**（表示易变关键字的意思），它可以用来修饰成员变量和静态成员变量，可以避免线程从自己的工作缓存中查找变量的值，必须到主存中获取它的值，线程操作 volatile 变量都是直接操作主存。
+
+```java
+public class Main {
+    volatile static boolean run = true;
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(() -> {
+            while (run) {
+                // running
+            }
+        });
+        t.start();
+        Thread.sleep(1000);
+        System.out.println("run stop");
+        run = false;  // 线程t会停下来
+    }
+}
+```
+
+使用 synchronized 关键字也有相同的效果！在 Java 内存模型中，synchronized 规定，线程在加锁时，先清空工作内存 → 在主内存中拷贝最新变量的副本到工作内存 → 执行完代码 → 将更改后的共享变量的值刷新到主内存中 → 释放互斥锁。
+
+```java
+public class Main {
+    static boolean run = true;
+    final static Object lock = new Object();
+    public static void main(String[] args) throws InterruptedException {
+        Thread t = new Thread(() -> {
+            while (true) {
+                synchronized(lock) {
+                    if (!run) {
+                        break;
+                    }                    
+                }
+                // running
+            }
+        });
+        t.start();
+        Thread.sleep(1000);
+        System.out.println("run stop");
+        synchronized(lock) {
+        	run = false;  // 线程t会停下来
+        }
+    }
+}
+```
+
+#### 可见性 vs 原子性
+
+前面例子体现的实际就是可见性，它保证的是在多个线程之间一个线程对 volatile 变量的修改对另一个线程可见， 而不能保证原子性，仅用在**一个写线程，多个读线程**的情况。
+
+上例从字节码理解是这样的：
+
+```java
+getstatic run // 线程 t 获取 run true
+getstatic run // 线程 t 获取 run true
+getstatic run // 线程 t 获取 run true
+getstatic run // 线程 t 获取 run true
+putstatic run // 线程 main 修改 run 为 false， 仅此一次
+getstatic run // 线程 t 获取 run false 
+```
+
+比较一下线程安全中的例子：两个线程，一个 `i++` 一个 `i--`，只能保证看到最新值，不能解决指令交错（只保证读到的数据是最新值）。
+
+```java
+// 假设i的初始值为0
+getstatic i // 线程2-获取静态变量i的值 线程内i=0
+getstatic i // 线程1-获取静态变量i的值 线程内i=0
+iconst_1 	// 线程1-准备常量1
+iadd 		// 线程1-自增 线程内i=1
+putstatic i // 线程1-将修改后的值存入静态变量i 静态变量i=1
+iconst_1 	// 线程2-准备常量1
+isub 		// 线程2-自减 线程内i=-1
+putstatic i // 线程2-将修改后的值存入静态变量i 静态变量i=-1 
+```
+
+> **注意**
+> synchronized 语句块既可以保证代码块的原子性，也同时保证代码块内变量的可见性。但缺点是 synchronized 是属于重量级操作，性能相对更低。
+>
+> 如果在前面示例的死循环中加入 System.out.println() 会发现即使不加 volatile 修饰符，线程 t 也能正确看到对 run 变量的修改了，这是因为 println 方法里面有 synchronized 修饰。
+
+#### 模式之两阶段终止
+
+除了使用 interrupt 方法，还可以使用 volatile 关键字来实现两阶段终止模式。
+
+```java
+private volatile boolean stop = false;
+private Thread monitorThread;
+// 启动监控线程
+public void start() {
+    monitorThread = new Thread(() -> {
+        while (true) {
+            Thread current = Thread.currentThread();
+            if (stop) {
+                System.out.println("料理后事");
+                break;
+            }
+            try {
+                Thread.sleep(1000);
+                System.out.println("执行监控");
+            }
+            catch (InterruptedException e) {
+            }
+        }
+    }, "monitor");
+    monitorThread.start();
+}
+// 停止监控线程
+public void stop() {
+    stop = true;
+    monitorThread.interrupt(); // 作用是打断线程的sleep状态，立即stop而不必等待这次sleep结束
+}
+```
+
+#### 同步模式之Balking
+
+定义：Balking（犹豫）模式用在一个线程发现另一个线程或本线程已经做了某一件相同的事，那么本线程就无需再做了，直接结束返回。（只执行一次）
+
+以上面的代码为例，实现同步模式，可以用一个 boolean 成员变量来记录某个方法是否被执行过。第一次执行，boolean : false --> true。非第一次执行，boolean : true，则直接返回结束。（**注意**，这一部分代码需要用 synchronized 来保护，由于可能有多个线程来写，因此不能用 volatile）
+
+### 有序性
+
+#### 指令重排
+
+JVM 会在不影响正确性的前提下，可以调整语句的执行顺序，分析下面代码：
+
+```java
+static int i;
+static int j;
+// 在某个线程内执行如下赋值操作
+i = ...;
+j = ...;
+```
+
+不论是先执行 i 还是先执行 j，对最终的结果不会产生影响。
+
+这种特性称为**指令重排**，单线程下指令重排和组合可以实现指令级并行，但多线程下指令重排会影响正确性。
+
+#### 诡异的结果
+
+```java
+int num = 0;
+boolean ready = false; 
+// 线程1 执行此方法
+public void actor1(I_Result r) {
+ 	if(ready) {
+ 		r.r1 = num + num;
+	} 
+ 	else {
+ 		r.r1 = 1;
+ 	}
+}
+// 线程2 执行此方法
+public void actor2(I_Result r) {
+ 	num = 2;
+ 	ready = true;
+}
+```
+
+I_Result 是一个对象，有一个属性 r1 用来保存结果，可能的结果有以下几种：
+
+> 情况1：线程1 先执行，这时 ready = false，所以进入 else 分支结果为 1
+>
+> 情况2：线程2 先执行 num = 2，但没来得及执行 ready = true，线程1 执行，还是进入 else 分支，结果为1
+>
+> 情况3：线程2 执行到 ready = true，线程1 执行，这回进入 if 分支，结果为 4（因为 num 已经执行过了）
+>
+> 情况4：线程2 执行 ready = true（num 还没有执行），切换到线程1，进入 if 分支，相加为 0，再切回线程2 执行 num = 2，结果为 0
+
+这种现象叫做指令重排，是 JIT 编译器在运行时的一些优化。
+
+重排序也需要遵守一定规则：
+
+1. 重排序操作不会对存在数据依赖关系的操作进行重排序。比如：a=1;b=a; 这个指令序列，由于第二个操作依赖于第一个操作，所以在编译时和处理器运行时这两个操作不会被重排序。
+2. 重排序是为了优化性能，但是不管怎么重排序，单线程下程序的执行结果不能被改变。比如：a=1;b=2;c=a+b;这三个操作，第一步（a=1)和第二步(b=2)由于不存在数据依赖关系，所以可能会发生重排序，但是c=a+b这个操作是不会被重排序的，因为需要保证最终的结果一定是c=a+b=3。
+
+#### 解决方法
+
+重排序在单线程模式下是一定会保证最终结果的正确性，但是在多线程环境下，就会出现问题。
+
+解决方法：volatile 修饰的变量，可以禁用指令重排。
+
+### volatile原理
+
+volatile 的底层实现原理是**内存屏障**，Memory Barrier（Memory Fence）
+
++ 对 volatile 变量的写指令后会加入写屏障
++ 对 volatile 变量的读指令前会加入读屏障
+
+#### 如何保证可见性
+
++ 写屏障（sfence）保证在该屏障之前的，对共享变量的改动，都同步到主存当中
+
+```java
+public void actor2(I_Result r) {
+	num = 2;
+    ready = true; // ready是被 volatile 修饰的, 赋值带写屏障
+    // 写屏障
+}
+```
+
++ 读屏障（lfence）保证在该屏障之后，对共享变量的读取，加载的是主存中最新数据
+
+```java
+public void actor1(I_Result r) {
+ 	// 读屏障
+ 	// ready 是被 volatil e修饰的, 读取值带读屏障
+ 	if(ready) {
+ 		r.r1 = num + num;
+ 	} else {
+ 		r.r1 = 1;
+ 	}
+}
+```
+
+```mermaid
+sequenceDiagram
+participant t1 as t1 线程
+participant num as num=0
+participant ready as volatile ready=flase
+participant t2 as t2 线程
+t1 -->> t1 : num=2
+t1 ->> ready : ready=true
+Note over t1,ready : 写屏障
+Note over num,t2 : 读屏障
+t2 ->> ready :读取ready=true
+t2 ->> num : 读取num=2
+```
+
+#### 如何保证有序性
+
++ 写屏障会确保指令重排序时，不会将写屏障之前的代码排在写屏障之后
+
+```java
+public void actor2(I_Result r) {
+	num = 2;
+    ready = true; // ready是被 volatile 修饰的, 赋值带写屏障
+    // 写屏障
+}
+```
+
++ 读屏障会确保指令重排序时，不会将读屏障之后的代码排在读屏障之前
+
+```java
+public void actor1(I_Result r) {
+ 	// 读屏障
+ 	// ready 是被 volatil e修饰的, 读取值带读屏障
+ 	if(ready) {
+ 		r.r1 = num + num;
+ 	} else {
+ 		r.r1 = 1;
+ 	}
+}
+```
+
+还是那句话，不能解决指令交错：
+
+1. 写屏障仅仅是保证之后的读能够读到最新的结果，但不能保证其它线程的读跑到它前面去
+2. 而有序性的保证也只是保证了本线程内相关代码不被重排序
+
+```mermaid
+sequenceDiagram
+participant t1 as t1 线程
+participant i as volatile i=0
+participant t2 as t2 线程
+t2 -->> i : 读取i=0
+t1 -->> i : 读取i=0
+t1 -->> t1 : i+1
+t1 -->> i : 写入i=1
+t2 -->> t2 : i-1
+t2 -->> i : 写入i=-1
+```
+
+### happens-before规则
+
+happens-before 规定了对共享变量的写操作对其他线程的读操作可见，它是可见性与有序性的一套规则总结，抛开以下 happens-before 规则，JMM 并不能保证一个线程对共享变量的写，对其他线程对该共享变量的读可见。
+
+下面说的变量都是指成员变量或静态成员变量：
+
+1. 线程解锁 m 之前对变量的写，对于接下来对 m 加锁的其他线程对该变量的读可见
+
+```java
+static int x;
+static Object m = new Object();
+
+new Thread(()->{
+    synchronized(m) {
+        x = 10;
+    }
+},"t1").start();
+
+new Thread(()->{
+    synchronized(m) {
+        System.out.println(x);
+    }
+},"t2").start();
+```
+
+2. 线程对 volatile 变量的写，对接下来其它线程对该变量的读可见
+
+```java
+volatile static int x;
+
+new Thread(()->{
+ 	x = 10;
+},"t1").start();
+
+new Thread(()->{
+ 	System.out.println(x);
+},"t2").start();
+```
+
+3. 线程 start 前对变量的写，对该线程开始后对该变量的读可见
+
+```java
+static int x;
+x = 10;
+
+new Thread(()->{
+ 	System.out.println(x);
+},"t2").start();
+```
+
+4. 线程结束前对变量的写，对其它线程得知它结束后的读可见（比如其它线程调用 `t1.isAlive()` 或 `t1.join()` 等待它结束）
+
+```java
+static int x;
+
+Thread t1 = new Thread(()->{
+ 	x = 10;
+},"t1");
+
+t1.start();
+t1.join();
+System.out.println(x);
+```
+
+5. 线程 t1 打断 t2（interrupt）前对变量的写，对于其他线程得知 t2 被打断后对变量的读可见（通过 `t2.interrupted` 或 `t2.isInterrupted`）
+
+```java
+static int x;
+public static void main(String[] args) {
+    Thread t2 = new Thread(()->{
+        while(true) {
+            if(Thread.currentThread().isInterrupted()) {
+                System.out.println(x);
+                break;
+            }
+        }
+    },"t2");
+    t2.start();
+    
+    new Thread(()->{
+        sleep(1);
+        x = 10;
+        t2.interrupt();
+    },"t1").start();
+    
+    while(!t2.isInterrupted()) {
+        Thread.yield();
+    }
+    System.out.println(x);
+}
+```
+
+6. 对变量默认值（0，false，null）的写，对其它线程对该变量的读可见
+7. 具有传递性，如果 x hb-> y 并且 y hb-> z 那么有 x hb-> z （happens-before），配合 volatile 的防指令重排，有下面的例子：
+
+```java
+volatile static int x;
+static int y;
+
+new Thread(()->{
+    y = 10;
+    x = 20;
+},"t1").start();
+
+new Thread(()->{
+    // x=20 对 t2 可见, 同时 y=10 也对 t2 可见
+    System.out.println(x);
+},"t2").start();
+```
+
+## 共享模型之无锁
+
+管程即 monitor 是阻塞式的悲观锁实现并发控制，这章我们将通过非阻塞式的乐观锁的来实现并发控制。
+
+举例：实现多线程银行取钱，可以用以下不加锁的代码来实现
+
+```java
+class AccountSafe {
+    private AtomicInteger balance;
+
+    public AccountCas(int balance) {
+        this.balance = new AtomicInteger(balance);
+    }
+
+    public int getBalance() {
+        return balance.get();
+    }
+
+    public void dec(int amount) {
+        while (true) {
+            int pre = getBalance();
+            int next = pre - amount;
+            if (balance.compareAndSet(pre, next)) {
+                break;
+            }
+        }
+    }
+}
+```
+
+### CAS与volatile
+
+#### cas
+
+前面看到的 AtomicInteger 的解决方法，内部并没有用锁来保护共享变量的线程安全。
+
+```java
+public void dec(Integer amount) {
+    // 核心代码
+    // 需要不断尝试，直到成功为止
+    while (true){
+        // 比如拿到了旧值 1000
+        int pre = getBalance();
+        // 在这个基础上 1000-10 = 990
+        int next = pre - amount;
+        /*
+             compareAndSet 正是做这个检查，在 set 前，先比较 prev 与当前值
+             - 不一致了，next 作废，返回 false 表示失败
+             比如，别的线程已经做了减法，当前值已经被减成了 990
+             那么本线程的这次 990 就作废了，进入 while 下次循环重试
+             - 一致，以 next 设置为新值，返回 true 表示成功
+			 */
+        if (atomicInteger.compareAndSet(pre,next)){
+            break;
+        }
+    }
+}
+```
+
+其中的关键是 compareAndSet，它的简称就是 CAS （也有 Compare And Swap 的说法），它必须是原子操作。
+
+```mermaid
+sequenceDiagram
+participant t1 as 线程1
+participant ac as Account 对象
+participant t2 as 线程2
+t1 ->> ac : 获取余额 100 元
+t1 ->> t1 : 减10 = 90
+t2 -->> ac : 已经修改为 90 了
+t1 ->> ac : cas(100, 90), false
+t1 ->> ac : 获取余额 90 元
+t1 ->> t1 : 减10 = 80
+t2 -->> ac : 已经修改为 80 了
+t1 ->> ac : cas(90, 80), false
+t1 ->> ac : 获取余额 80 元
+t1 ->> t1 : 减10 = 70
+t1 ->> ac : cas(80, 70), true
+```
+
+#### volatile
+
+在上面代码中的 AtomicInteger，底层实现的保存值value属性使用了 volatile 修饰。获取共享变量时，为了保证该变量的可见性，需要使用 volatile 修饰。
+
+它可以用来修饰成员变量和静态成员变量，可以避免线程从自己的工作缓存中查找变量的值，必须到主存中获取它的值，线程操作 volatile 变量都是直接操作主存。即一个线程对 volatile 变量的修改，对另一个线程可见。
+
+> 注意：volatile 仅仅保证了共享变量的可见性，让其它线程能够看到最新值，但不能解决指令交错问题（不能保证原子性）
+
+CAS 必须借助 volatile 才能读取到共享变量的最新值来实现【比较并交换】的效果
+
+#### 为什么无锁效率高
+
+1. 无锁情况下，即使重试失败，线程始终在高速运行，没有停歇，而 synchronized 会让线程在没有获得锁的时候，发生上下文切换，进入阻塞，代价比较大。
+2. 但无锁情况下，因为线程要保持运行，需要额外 CPU 的支持。如果只有单核 CPU，线程想高速运行也无从谈起，虽然不会进入阻塞，但由于没有分到时间片，仍然会进入 ready 状态，还是会导致上下文切换。也就是说，线程数少于 CPU 核心数的时候，用 CAS 比较合适。
+
+#### cas的特点
+
+结合 CAS 和 volatile 可以实现无锁并发，适用于线程数少、多核 CPU 的场景下。
+
+1. CAS 是基于乐观锁的思想：最乐观的估计，不怕别的线程来修改共享变量，就算改了也没关系，我吃亏点再重试呗。
+
+2. synchronized 是基于悲观锁的思想：最悲观的估计，得防着其它线程来修改共享变量，我上了锁你们都别想改，我改完了解开锁，你们才有机会。
+
+3. CAS 体现的是无锁并发、无阻塞并发
+
+   + 因为没有使用 synchronized，所以线程不会陷入阻塞，这是效率提升的因素之一
+
+   + 但如果竞争激烈（写操作多），可以想到重试必然频繁发生，反而效率会受影响
+
+### 原子整数
+
+java.util.concurrent（J.U.C）并发包提供了一些并发工具类，这里把它分成五类：
+
+1. 使用原子的方式更新基本类型
+
+   - AtomicInteger：整型原子类
+   - AtomicLong：长整型原子类
+   - AtomicBoolean ：布尔型原子类
+
+   上面三个类提供的方法几乎相同，所以我们将以 AtomicInteger 为例子来介绍。
+
+2. 原子引用
+
+3. 原子数组
+
+4. 字段更新器
+
+5. 原子累加器
+
+下面先讨论原子整数类，以 AtomicInteger 为例讨论它的 api 接口：通过观察源码可以发现，AtomicInteger 内部都是通过 cas 的原理来实现的。
+
+```java
+public static void main(String[] args) {
+    AtomicInteger i = new AtomicInteger(0);
+    System.out.println(i.incrementAndGet()); // ++i, 打印1, 结果i=1
+    System.out.println(i.getAndIncrement()); // i++, 打印1, 结果i=2
+    System.out.println(i.getAndAdd(5)); // 打印2, 结果i=7
+    System.out.println(i.addAndGet(5)); // 打印12, 结果i=12
+    // 减法类似
+    // 更复杂的用法如下, 函数式编程接口, 其中函数中的操作能保证原子, 但函数需要无副作用
+    System.out.println(i.getAndUpdate(x -> x * 10)); // 打印12, 结果i=120
+    System.out.println(i.updateAndGet(x -> x / 10)); // 打印12, 结果i=12
+}
+```
+
+### 原子引用
+
+为什么需要原子引用？因为要保护的共享数据并不都是基本类型的，还有可能是别的类型，比如 BigDecamal 小数类型。
+
+- AtomicReference：引用类型原子类
+- AtomicStampedReference：原子更新带有版本号的引用类型。该类将整数值与引用关联起来，可用于解决原子的更新数据和数据的版本号，可以解决使用 CAS 进行原子更新时可能出现的 ABA 问题。
+- AtomicMarkableReference ：原子更新带有标记的引用类型。该类将 boolean 标记与引用关联起来，也可以解决使用 CAS 进行原子更新时可能出现的 ABA 问题。
+
+```java
+class DecimalAccountCas {
+    private AtomicReference<BigDecimal> balance;
+
+    public DecimalAccountCas(BigDecimal balance) {
+        this.balance = new AtomicReference<>(balance);
+    }
+    public BigDecimal getBalance() {
+        return balance.get();
+    }
+    public void dec(BigDecimal amount) {
+        while (true) {
+            BigDecimal pre = getBalance();
+            // 注意: 这里的balance返回的是一个新的对象，即 pre!=next
+            BigDecimal next = pre.subtract(amount);
+            if (balance.compareAndSet(pre, next)) {
+                break;
+            }
+        }
+    }
+}
+```
+
+
+
+
 
 
 
@@ -2093,14 +2710,19 @@ public class SlotTest {
 ##### 静态变量与局部变量的对比
 
 + 变量的分类：
+
   + 按数据类型分：基本数据类型、引用数据类型
+
   + 按类中声明的位置分：成员变量（类变量，实例变量）、局部变量
+
     > 类变量：linking的prepare阶段：给类变量默认赋值 --> initial阶段：给类变量显式赋值即静态代码块赋值
     > 实例变量：随着对象创建，会在堆空间中分配实例变量空间，并进行默认赋值
     > 局部变量：在使用前必须进行显式赋值，不然编译不通过。
 
 + 参数表分配完毕之后，再根据方法体内定义的变量的顺序和作用域分配。
+
 + 我们知道类变量表有两次初始化的机会，第一次是在**准备阶段**，执行系统初始化，对类变量设置零值，另一次则是在**初始化阶段**，赋予程序员在代码中定义的初始值。
+
 + 和类变量初始化不同的是，局部变量表不存在系统初始化的过程，这意味着一旦定义了局部变量则必须人为的初始化，否则无法使用。
 
 ```java
