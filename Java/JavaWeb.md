@@ -1505,6 +1505,44 @@ web 资源按实现的技术和呈现的效果的不同，又分为静态资源�
 
 ![image-20210810135433016](https://gitee.com/cmz2000/album/raw/master/image/image-20210810135433016.png)
 
+### 配置
+
+#### 端口
+
+默认端口是8080
+
+可以在conf目录下的server.xml文件中进行修改
+
+![image-20210829161026520](https://gitee.com/cmz2000/album/raw/master/image/image-20210829161026520.png)
+
+#### 主机名称
+
+默认主机名是localhost（127.0.0.1），如果要修改默认主机名，Windows下还需要同时修改hosts文件映射关系
+
+默认网页应用存放位置为webapps文件夹
+
+![image-20210829161522693](https://gitee.com/cmz2000/album/raw/master/image/image-20210829161522693.png)
+
+### 网站应有的结构
+
+```
+-- webapps: Tomcat服务器的web目录
+	- ROOT: 默认访问目录
+	- strawberry: 自己网站的目录名
+		- WEB-INF
+			- classes: java程序（.class文件）
+			- lib: web应用所依赖的jar包
+			- web.xml: 网站配置文件
+		- index.html 或者 index.jsp: 默认的首页
+		- static
+			- css
+			- js
+			- img
+		- ...
+```
+
+
+
 # Servlet
 
 ## 概念和技术
@@ -1595,7 +1633,8 @@ public class Hello implements Servlet {
 
 1. 编写一个类去继承 HttpServlet 类
 2. 根据业务需要重写 doGet 或 doPost 方法
-3. 到 web.xml 中的配置 Servlet 程序的访问地址  
+3. 到 web.xml 中的配置 Servlet 程序的访问地址
+   + 为什么需要映射：我们写的是JAVA程序，但是要通过浏览器访问，而浏览器需要连接web服务器，所以我们需要在web服务器中注册我们写的Servlet，还需给他一个浏览器能够访问的路径
 
 代码演示：
 
@@ -1613,9 +1652,116 @@ public class Hello2 extends HttpServlet {
 }
 ```
 
+在 web.xml 中编写映射：
+
+```xml
+<!-- 注册Servlet -->
+<servlet>
+    <servlet-name>hello</servlet-name> <!--名字，随便写，但要和请求路径中的name相同-->
+    <servlet-class>com.strawberry.servlet.HelloServlet</servlet-class> <!--注册的类-->
+</servlet>
+<!-- Servlet的请求路径 -->
+<servlet-mapping>
+    <servlet-name>hello</servlet-name>
+    <url-pattern>/hello</url-pattern>	<!--浏览器中访问路径-->
+</servlet-mapping>
+```
+
+对于上述映射，访问地址为：`localhost:8080/项目名/hello`
+
 ### Servlet类的继承体系
 
 ![image-20210811150336128](https://gitee.com/cmz2000/album/raw/master/image/image-20210811150336128.png)
+
+## Servlet原理
+
+Servlet是由Web服务器调用，web服务器在收到浏览器请求后，会执行以下操作：
+
+![image-20210829192840990](https://gitee.com/cmz2000/album/raw/master/image/image-20210829192840990.png)
+
+### Mapping映射
+
+1. 一个Servlet可以指定一个映射路径
+
+```xml
+<servlet>
+    <servlet-name>hello</servlet-name>
+    <servlet-class>com.strawberry.servlet.HelloServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>hello</servlet-name>
+    <url-pattern>/hello</url-pattern>
+</servlet-mapping>
+```
+
+2. 一个Servlet可以指定多个映射路径
+
+```xml
+<servlet>
+    <servlet-name>hello</servlet-name>
+    <servlet-class>com.strawberry.servlet.HelloServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>hello</servlet-name>
+    <url-pattern>/hello</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>hello</servlet-name>
+    <url-pattern>/hello2</url-pattern>
+</servlet-mapping>
+```
+
+3. 一个Servlet可以指定通用映射路径
+
+```xml
+<servlet>
+    <servlet-name>hello</servlet-name>
+    <servlet-class>com.strawberry.servlet.HelloServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>hello</servlet-name>
+    <url-pattern>/hello/*</url-pattern> <!-- *号表示通配符，/hello下的任何请求都会被映射，包括/hello本身 -->
+</servlet-mapping>
+```
+
+4. 也可以自定义访问后缀
+
+```xml
+<servlet>
+    <servlet-name>hello</servlet-name>
+    <servlet-class>com.strawberry.servlet.HelloServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>hello</servlet-name>
+    <url-pattern>*.hello</url-pattern> <!-- 会映射所有以.hello为后缀的，注意，通配符*前不能加斜杠/ -->
+</servlet-mapping>
+```
+
+#### 优先级问题
+
+指定了固有的映射路径优先级最高，其次才会走通配符或者默认的处理请求
+
+```xml
+<servlet>
+    <servlet-name>hello</servlet-name>
+    <servlet-class>com.strawberry.servlet.HelloServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>hello</servlet-name>
+    <url-pattern>/hello</url-pattern>
+</servlet-mapping>
+
+<servlet>
+    <servlet-name>error</servlet-name>
+    <servlet-class>com.strawberry.servlet.ErrorServlet</servlet-class>
+</servlet>
+<servlet-mapping>
+    <servlet-name>error</servlet-name>
+    <url-pattern>/*</url-pattern>
+</servlet-mapping>
+```
+
+在上述代码情况下，除了具体实现的映射路径会走具体实现类，其余的未定义路径都会交给ErrorServlet处理，可以实现404等页面。
 
 ## ServletConfig类
 
@@ -1639,12 +1785,12 @@ ServletConfig 类有三大作用：
 
 1. ServletContext 是一个接口， 它表示 Servlet 上下文对象
 2. 一个 web 工程， 只有一个 ServletContext 对象实例。
-3. ServletContext 对象是一个域对象。
-4. ServletContext 是在 web 工程部署启动的时候创建。 在 web 工程停止的时候销毁。
+3. ServletContext 对象是一个域对象，代表了当前的web应用，包含多个servlet应用。
+4. ServletContext 是在 web 工程部署启动的时候创建，在 web 工程停止的时候销毁。
 
 什么是域对象?
 
-域对象，是可以像 Map 一样存取数据的对象，叫域对象。这里的域指的是存取数据的操作范围，整个 web 工程。
+域对象，是可以像 Map 一样存取数据的对象。这里的域指的是存取数据的操作范围，整个 web 工程。
 
 |            | 存数据           | 取数据           | 删除数据            |
 | ---------- | ---------------- | ---------------- | ------------------- |
@@ -1653,14 +1799,299 @@ ServletConfig 类有三大作用：
 
 ### 作用
 
-1. 获取 web.xml 中配置的上下文参数 context-param
-2. 获取当前的工程路径， 格式: /工程路径
-3. 获取工程部署后在服务器硬盘上的绝对路径
-4. 像 Map 一样存取数据  
++ 在不同的servlet应用之间共享数据
 
-## HttpServletRequest类
+示例如下：
+
+```java
+public class HelloServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // get方法访问这个类的时候，往context中以k-v形式存放一些数据
+        ServletContext context = this.getServletContext();
+        String value = "strawberry";
+        context.setAttribute("key", value);
+        resp.getWriter().println("set key success");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+```java
+public class GetContext extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // get方法访问这个类的时候，从context中通过k读取相应的v，可以实现不同servlet之间共享数据
+        ServletContext context = this.getServletContext();
+        String value = (String) context.getAttribute("key");
+        resp.getWriter().println("value: " + value);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
++ 获取 web.xml 中配置的上下文参数 context-param （`getInitParameter()`方法）
++ 获取当前的工程路径，格式: /工程路径
++ 获取工程部署后在服务器硬盘上的绝对路径
++ 像 Map 一样存取数据
+
+### 请求转发
+
+![image-20210830150650064](https://gitee.com/cmz2000/album/raw/master/image/image-20210830150650064.png)
+
+通过 ServletContext 类的`getServletContext()`方法可以实现请求转发
+
+```java
+public class Demo extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        ServletContext context = this.getServletContext();
+        // 转发的请求路径，把对Demo类的访问转发到/hello路径下
+        RequestDispatcher requestDispatcher = context.getRequestDispatcher("/hello");
+        // 调用forward()方法实现请求转发
+        requestDispatcher.forward(req, resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+Tips：注意区分请求转发和重定向（类似于DNS中递归查询与迭代查询的区别）
+
+### 读取资源文件
+
+```java
+public class Demo2 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 通过Properties类来读取
+        InputStream is = this.getServletContext().getResourceAsStream("/WEB-INF/classes/db.properties");
+        Properties properties = new Properties();
+        properties.load(is);
+        String username = properties.getProperty("username");
+        String password = properties.getProperty("password");
+        resp.getWriter().println(username + ":" + password);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+```properties
+username=root
+password=123456
+```
+
+## HttpServletResponse
+
+web服务器接收到客户端的http请求，针对这个请求，分别创建一个代表请求的HttpServletRequest对象，代表响应的一个HttpServletResponse对象
+
++ 如果要获取客户端请求过来的参数：HttpServletRequest
++ 如果要给客户端响应一些信息：HttpServletResponse
+
+### 一些方法
+
+向浏览器输出数据
+
+```java
+public ServletOutputStream getOutputStream() throws IOException;
+public PrintWriter getWriter() throws IOException;
+```
+
+向浏览器发送响应头
+
+```java
+public void setCharacterEncoding(String charset);
+public void setContentLength(int len);
+public void setContentLengthLong(long len);
+public void setContentType(String type);    
+public void setDateHeader(String name, long date);
+public void addDateHeader(String name, long date);
+public void setHeader(String name, String value);
+public void addHeader(String name, String value);
+public void setIntHeader(String name, int value);
+public void addIntHeader(String name, int value);
+```
+
+### 常见应用
+
+#### 向浏览器输出消息
+
+Writer 或者 OutputStream
+
+#### 下载文件
+
+```java
+public class FileServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 1.获取下载文件的路径
+        String realPath = "D:\\Java_project\\Servlet\\servlet-01\\target\\servlet-01\\WEB-INF\\classes\\honey.jpg";
+        System.out.println("下载文件的路径:" + realPath);
+        // 2.获取下载的文件名
+        String fileName = realPath.substring(realPath.lastIndexOf('\\') + 1);
+        // 3.设置浏览器支持下载我们需要的东西，转换文件名编码使得支持中文
+        resp.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
+        // 4.获取下载文件的输入流
+        FileInputStream in = new FileInputStream(realPath);
+        // 5.创建缓冲区
+        int len = 0;
+        byte[] buffer = new byte[1024];
+        // 6.获取OutputStream对象
+        ServletOutputStream out = resp.getOutputStream();
+        // 7.输出
+        while ((len = in.read(buffer)) > 0) {
+            out.write(buffer, 0, len);
+        }
+        in.close();
+        out.close();
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+#### 验证码功能
+
+验证码怎么来的？
+
++ 前端实现
++ 后端实现，需要用到 Java 的图片类，生成一个图片
+
+```java
+public class ImageServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 让浏览器3秒自动刷新一次
+        resp.setHeader("refresh", "3");
+        // 在内存中创建一个图片
+        BufferedImage image = new BufferedImage(80, 20, BufferedImage.TYPE_INT_RGB);
+        // 得到图片
+        Graphics2D graphics = (Graphics2D) image.getGraphics(); // 笔
+        // 设置背景颜色
+        graphics.setColor(Color.white);
+        graphics.fillRect(0, 0, 80, 20);
+        // 给图片写数据
+        graphics.setColor(Color.BLUE);
+        graphics.setFont(new Font(null, Font.BOLD, 20));
+        graphics.drawString(randomNum(), 0, 20);
+        // 告诉浏览器，用图片方式打开
+        resp.setContentType("image/png");
+        // 网站存在缓存，设置浏览器不缓存
+        resp.setDateHeader("expires", -1);
+        resp.setHeader("Cache-Control", "no-cache");
+        resp.setHeader("Pragma", "no-cache");
+
+        ImageIO.write(image, "png", resp.getOutputStream());
+    }
+
+    // 生成7位随机数
+    private String randomNum() {
+        Random random = new Random();
+        String num = random.nextInt(999999) + "";
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < 6 - num.length(); i++) {
+            sb.append("0");
+        }
+        num = sb.toString() + num;
+        return num;
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+效果图如下
+
+![image-20210830145859125](https://gitee.com/cmz2000/album/raw/master/image/image-20210830145859125.png)
+
+#### 重定向
+
+![image-20210830150203079](https://gitee.com/cmz2000/album/raw/master/image/image-20210830150203079.png)
+
+一个web资源B收到客户端A请求后，B会通知A客户端去访问另外一个web资源C，这个过程叫重定向。
+
+```java
+public class RedirectServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        /**
+        * 重定向，相当于下面两步操作
+        * resp.setHeader("Location", "/servlet_01/img");
+        * resp.setStatus(302);
+        * */
+        resp.sendRedirect("/servlet_01/img");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+常用场景：
+
++ 用户登录（页面跳转）
+
+```jsp
+<html>
+<body>
+<%--需要寻址提交到项目的路径--%>
+<%--${pageContext.request.contextPath}代表当前项目--%>
+<%--提交表单后，跳转到当前项目的/login位置，即访问下面的LoginServlet类--%>
+<form action="${pageContext.request.contextPath}/login" method="get">
+    用户名：<input type="text" name="username"> <br>
+    密码：<input type="password" name="password"> <br>
+    <input type="submit">
+</form>
+</body>
+</html>
+```
+
+```java
+public class LoginServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 处理请求
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+        // 重定向到成功页面，一定要注意路径问题
+        resp.sendRedirect("/servlet_01/success.jsp");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+## HttpServletRequest
 
 ### 作用
+
+代表客户端的请求。
 
 每次只要有请求进入 Tomcat 服务器， Tomcat 服务器就会把请求过来的 HTTP 协议信息解析好封装到 Request 对象中。然后传递到 service 方法（ doGet 和 doPost） 中给我们使用。 我们可以通过 HttpServletRequest 对象， 获取到所有请求的信息。  
 
@@ -1670,6 +2101,501 @@ ServletConfig 类有三大作用：
 
 ### 请求转发
 
-查看 pdf 笔记
+在一个html页面上提交表单
 
-## HttpServletResponse类
+```html
+<div style="text-align: center">
+    <form action="${pageContext.request.contextPath}/loginRequest" method="post">
+        用户名：<input type="text" name="username"> <br>
+        密码：<input type="password" name="password"> <br>
+        爱好：
+        <input type="checkbox" name="hobby" value="reading"> 阅读
+        <input type="checkbox" name="hobby" value="singing"> 唱歌
+        <input type="checkbox" name="hobby" value="movie"> 电影
+        <input type="checkbox" name="hobby" value="coding"> 代码
+        <br>
+        <input type="submit">
+    </form>
+</div>
+```
+
+向下面的Servlet发出请求
+
+```java
+public class LoginServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // 解决编码格式问题
+        req.setCharacterEncoding("utf-8");
+        resp.setCharacterEncoding("utf-8");
+        String username = req.getParameter("username");
+        String password = req.getParameter("password");
+        String[] hobbies = req.getParameterValues("hobby");
+        System.out.println(username + ":" + password);
+        System.out.println(Arrays.toString(hobbies));
+        // 请求转发方式，斜杠/代表当前web应用
+        req.getRequestDispatcher("/success.jsp").forward(req, resp);
+        // 重定向方式，注意与请求转发方式的路径区别
+//        resp.sendRedirect("/servlet_01/success.jsp");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+# Cookie、Session
+
+## 会话
+
+会话：用户打开一个浏览器，点击了很多超链接，访问多个web资源，关闭浏览器，这个过程可以称之为会话
+
+有状态会话：一个同学来过教室，下次再来教室，我们会知道这个同学，曾经来过，称之为有状态会话
+
+**一个网站，怎么证明你来过？**
+
+1. 服务端给客户端一个信件，客户端下次访问服务端带上信件就可以了（cookie）
+2. 服务器登记你来过了，下次你来的时候我来匹配你（session）
+
+### 保存会话的两种技术
+
+**cookie**：客户端技术（响应，请求）
+
+**session**：服务器技术，利用这个技术，可以保存用户的会话信息。我们可以把信息或者数据放在Session中
+
+常见：网站登录之后，下次不用再登录了，第二次访问直接就上去了
+
+## Cookie
+
+1. 从请求中拿到cookie信息
+2. 服务器响应给客户端cookie
+
+```java
+public class CookieDemo1 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("utf8");
+        resp.setCharacterEncoding("utf8");
+        PrintWriter out = resp.getWriter();
+        // 服务器从客户端请求中获取cookie（可能多个）
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null) {
+            out.write("你上次访问的时间：");
+            for (int i = 0; i < cookies.length; i++) {
+                Cookie cookie = cookies[i];
+                // 获取cookie的名字
+                if (cookie.getName().equals("lastLoginTime")) {
+                    // 获取cookie的值
+                    long lastLoginTime = Long.parseLong(cookie.getValue());
+                    Date date = new Date(lastLoginTime);
+                    out.write(date.toLocaleString());
+                }
+            }
+        }
+        else {
+            out.write("这是你第一次访问本站");
+        }
+        // 服务端给客户端响应一个cookie（k-v）
+        Cookie cookie = new Cookie("lastLoginTime", "" + System.currentTimeMillis());
+        // cookie.setMaxAge(24*60*60); // 设置cookie的有效期为24小时
+        resp.addCookie(cookie);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+![image-20210830200702078](https://gitee.com/cmz2000/album/raw/master/image/image-20210830200702078.png)
+
+一些细节：
+
++ 一个Cookie只能保存一个信息（采用k-v方式存储）
++ 一个web站点可以给浏览器发送多个cookie，最多存放20个cookie
++ Cookie大小有限制（例如4KB）
++ 浏览器cookie上限约为300个
+
+删除cookie：
+
++ 不设置有效期，关闭浏览器，自动失效
++ 设置有效期时间为 0
+
+cookie中文乱码问题：编码解码
+
+```java
+URLEncoder.encode("草莓汁", "utf-8");
+URLDecoder.decode(cookie,getValue(), "utf-8");
+```
+
+## Session（重点）
+
+### 概念
+
+什么是Session：
+
++ 服务器会给每一个用户（浏览器）创建一个Session对象，由SessionID区分（每个用户唯一）
++ 一个Session独占一个浏览器，只要浏览器没有关闭，这个Session就存在
++ 用户登录之后，整个网站它都可以访问 --> 保存用户的信息、保存购物车的信息 ...
+
+![image-20210830213038705](https://gitee.com/cmz2000/album/raw/master/image/image-20210830213038705.png)
+
+### 使用
+
+代码示例
+
+```java
+public class SessionDemo01 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("utf8");
+        resp.setCharacterEncoding("utf8");
+        resp.setContentType("text/html;charset=utf-8");
+        // 得到session
+        HttpSession session = req.getSession();
+        // 往session存放东西
+        session.setAttribute("name", "草莓汁");
+        // 获取session的id
+        String sessionId = session.getId();
+        // 判断session是不是新创建
+        if (session.isNew()) {
+            resp.getWriter().write("session创建成功，ID：" + sessionId);
+        }
+        else {
+            resp.getWriter().write("session已经在服务器中存在了，ID：" + sessionId);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+![image-20210830204308355](https://gitee.com/cmz2000/album/raw/master/image/image-20210830204308355.png)
+
+Session在创建的时候做了什么事情？
+
++ 往cookie中存放一个键值对，名称是 JSESSIONID
++ 每次请求的时候 cookie 把 JSESSIONID 带过来
+
+```java
+Cookie cookie = new Cookie("JSESSIONID", sessionId);
+resp.addCookie(cookie);
+```
+
+#### 存取对象
+
+Session也可以在不同的Servlet之间共享数据，是跨Servlet的（尽量用session，少用ServletContext）
+
+如下代码所示，在Demo1中往session存放一个person对象，可以在Demo2中把person对象取出来
+
+```java
+public class SessionDemo01 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("utf8");
+        resp.setCharacterEncoding("utf8");
+        resp.setContentType("text/html;charset=utf-8");
+        // 得到session
+        HttpSession session = req.getSession();
+        // 往session存放东西
+        session.setAttribute("name", new Person("草莓汁", 18));
+        // 获取session的id
+        String sessionId = session.getId();
+        // 判断session是不是新创建
+        if (session.isNew()) {
+            resp.getWriter().write("session创建成功，ID：" + sessionId);
+        }
+        else {
+            resp.getWriter().write("session已经在服务器中存在了，ID：" + sessionId);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+```java
+public class SessionDemo02 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        // 取出person对象
+        Person person = (Person) session.getAttribute("name");
+        System.out.println(person);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+![image-20210830205503115](https://gitee.com/cmz2000/album/raw/master/image/image-20210830205503115.png)
+
+#### 注销
+
+==手动==注销session，使用`Session.invalidate()`方法
+
+```java
+public class SessionDemo3 extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
+        session.removeAttribute("name");
+        // 手动注销session
+        session.invalidate();
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}
+```
+
+只要访问这个方法所在类的路径，就可以注销session
+
+==自动==注销，可以在 web.xml 中设置，代码如下：
+
+```xml
+<!--可以设置Session的默认失效时间-->
+<session-config>
+    <!--15分钟后Session自动失效，单位是分钟-->
+    <session-timeout>15</session-timeout>
+</session-config>
+```
+
+### 与Cookie区别
+
++ Cookie是把用户的数据写给用户的浏览器，浏览器保存（可以保存多个）
++ Session把用户的数据写到用户独占Session中，服务器端保存（==保存重要的信息==，减少服务器资源的浪费）
++ Session对象由服务创建
+
+# JSP
+
+## 概念
+
+Java Server Pages：Java服务器端页面，也和Servlet一样，用于动态Web技术
+
+**最大的特点**：写 JSP 就像在写 HTML
+
+**区别**：
+
++ HTML只给用户提供静态的数据
++ JSP页面中可以嵌入 Java 代码，为用户提供动态数据
+
+## JSP原理
+
+tomcat 中有一个 work 目录
+
+![image-20210830221314069](https://gitee.com/cmz2000/album/raw/master/image/image-20210830221314069.png)
+
+![image-20210830221408812](https://gitee.com/cmz2000/album/raw/master/image/image-20210830221408812.png)
+
+在上图目录下，发现 jsp 转换成立 Java 程序
+
+![image-20210830221430324](https://gitee.com/cmz2000/album/raw/master/image/image-20210830221430324.png)
+
+也就是说，浏览器向服务器发送请求，不管访问什么资源，其实都是在访问 Servlet
+
+jsp 也会转换成 一个Java类（==jsp 本质上就是Servlet==），查看源码可知
+
+```java
+public final class index_jsp extends org.apache.jasper.runtime.HttpJspBase
+    implements org.apache.jasper.runtime.JspSourceDependent,
+                 org.apache.jasper.runtime.JspSourceImports {...}
+```
+
+```java
+public abstract void _jspService(HttpServletRequest var1, HttpServletResponse var2) throws ServletException, IOException;
+```
+
+在 `index_jsp.java` 源码中，内置了一些对象
+
+```java
+final javax.servlet.jsp.PageContext pageContext;			// 页面上下文
+javax.servlet.http.HttpSession session = null;				// session
+final javax.servlet.ServletContext application;				// applicationContext
+final javax.servlet.ServletConfig config;
+javax.servlet.jsp.JspWriter out = null;
+final java.lang.Object page = this;							// page：当前
+javax.servlet.jsp.JspWriter _jspx_out = null;
+javax.servlet.jsp.PageContext _jspx_page_context = null;
+```
+
+输出页面前增加的代码为：
+
+```java
+response.setContentType("text/html");
+pageContext = _jspxFactory.getPageContext(this, request, response,
+                                          null, true, 8192, true);
+_jspx_page_context = pageContext;
+application = pageContext.getServletContext();
+config = pageContext.getServletConfig();
+session = pageContext.getSession();
+out = pageContext.getOut();
+_jspx_out = out;
+```
+
+![image-20210831212908694](https://gitee.com/cmz2000/album/raw/master/image/image-20210831212908694.png)
+
+在 jsp 中，Java代码会原封不动的输出
+
+HTML代码会转换为如下格式的Java代码输出给前端：
+
+```java
+out.write("<html>\n");
+out.write("<body>\n");
+out.write("<h2>Hello World!</h2>\n");
+out.write("</body>\n");
+out.write("</html>\n");
+```
+
+## JSP基础语法
+
+### jsp 文件头部声明  
+
+```jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+```
+
+这是 jsp 文件的头声明，表示这是 jsp 页面。 
+
+头部声明的各种属性如下： 
+
+```jsp
+language		值只能是 java，表示翻译的得到的是 java 语言
+contentType		设置响应头 contentType 的内容
+pageEncoding	设置当前 jsp 页面的编码
+import			给当前 jsp 页面导入需要使用的类包
+autoFlush		设置是否自动刷新 out 的缓冲区，默认为 true
+buffer			设置 out 的缓冲区大小，默认为 8KB
+errorPage		设置当前 jsp 发生错误后，需要跳转到哪个页面去显示错误信息
+isErrorPage		设置当前 jsp 页面是否是错误页面。是的话，就可以使用 exception 异常对象
+session			设置当前 jsp 页面是否获取 session 对象，默认为 true
+extends			给服务器厂商预留的 jsp 默认翻译的 servlet 继承于什么类
+```
+
+### 三种脚本
+
+#### 代码脚本
+
+```jsp
+<% java 代码 %>
+```
+
+代码脚本里可以书写任意的 java 语句。
+
+代码脚本的内容都会被翻译到 service 方法中。所以 service 方法中可以写的 java 代码，都可以写到代码脚本中。
+
+```jsp
+<%--代码中还可以嵌入HTML元素--%>
+<%
+	for (int i = 0; i < 5; i++) {
+%>
+	<h1>Hello, world <%=i%> </h1>
+<%
+	}
+%>
+```
+
+#### 声明脚本
+
+```jsp
+<%!
+	java 代码
+%>
+```
+
+在声明脚本块中， 我们可以干 4 件事情
+
+1. 我们可以定义全局变量。
+2. 定义 static 静态代码块
+3. 定义方法
+4. 定义内部类
+
+几乎所有可以写在类的内部的代码，都可以通过声明脚本来实现。
+
+也就是说，在声明脚本内，变量的作用域是类或对象，而代码脚本内，变量是局部变量，作用域只限于service方法内。
+
+```jsp
+<%!
+    static {
+    	System.out.println("Loading Servlet");
+	}
+	private int globalVar = 0;
+	public void hello() {
+        System.out.println("进入了方法hello");
+    }
+%>
+```
+
+#### 表达式脚本
+
+```jsp
+<%=表达式 %>
+```
+
+表达式脚本用于向页面输出内容。
+
+表达式脚本翻译到 Servlet 程序的 service 方法中以 out.print() 打印输出
+
+out 是 jsp 的一个内置对象，用于生成 html 的源代码
+
+注意：表达式不要以分号结尾，否则会报错
+
+表达式脚本可以输出任意类型。比如：
+
+1. 输出整型
+2. 输出浮点型
+3. 输出字符串
+4. 输出对象
+
+```jsp
+<%=12 %>
+<%=12.12 %>
+<%="12123" %>
+<%=temp %>
+```
+
+##### EL表达式
+
+表达式脚本也可以用EL表达式来表示，更简便。EL表达式格式如下
+
+```jsp
+${}
+```
+
+把上面的表达式脚本，用EL表达式表示为：
+
+```jsp
+${12}
+${12.12}
+${"12123"}
+${temp}
+```
+
+### 注释
+
+```jsp
+// 单行 java 注释
+/*
+	多行 java 代码注释
+*/
+java单行注释和多行注释能在翻译后的 java 源代码中看见。
+<%-- jsp 注释 --%>
+jsp 注释在翻译的时候会直接被忽略掉
+<!-- html 注释 -->
+html 注释可以在html页面的源代码中看见
+```
+
