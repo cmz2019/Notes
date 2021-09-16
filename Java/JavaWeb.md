@@ -1586,7 +1586,7 @@ public class HelloServlet implements Servlet {
 1. 执行 Servlet 构造器方法
 2. 执行 init 初始化方法（第一、二步，是在第一次访问的时候创建 Servlet 程序会调用）。
 3. 执行 service 方法（第三步，每次访问都会调用）。
-4. 执行 destroy 销毁方法（第四步，在 web 工程停止的时候调用）。  
+4. 执行 destroy 销毁方法（第四步，在 web 工程停止的时候调用）。
 
 ```java
 public class Hello implements Servlet {
@@ -2463,29 +2463,6 @@ out.write("</html>\n");
 
 ## JSP基础语法
 
-### jsp 文件头部声明  
-
-```jsp
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-```
-
-这是 jsp 文件的头声明，表示这是 jsp 页面。 
-
-头部声明的各种属性如下： 
-
-```jsp
-language		值只能是 java，表示翻译的得到的是 java 语言
-contentType		设置响应头 contentType 的内容
-pageEncoding	设置当前 jsp 页面的编码
-import			给当前 jsp 页面导入需要使用的类包
-autoFlush		设置是否自动刷新 out 的缓冲区，默认为 true
-buffer			设置 out 的缓冲区大小，默认为 8KB
-errorPage		设置当前 jsp 发生错误后，需要跳转到哪个页面去显示错误信息
-isErrorPage		设置当前 jsp 页面是否是错误页面。是的话，就可以使用 exception 异常对象
-session			设置当前 jsp 页面是否获取 session 对象，默认为 true
-extends			给服务器厂商预留的 jsp 默认翻译的 servlet 继承于什么类
-```
-
 ### 三种脚本
 
 #### 代码脚本
@@ -2599,3 +2576,134 @@ jsp 注释在翻译的时候会直接被忽略掉
 html 注释可以在html页面的源代码中看见
 ```
 
+## JSP指令
+
+### jsp 文件头部声明  
+
+```jsp
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+```
+
+这是 jsp 文件的头声明，表示这是 jsp 页面。 
+
+头部声明的各种属性如下： 
+
+```jsp
+language		值只能是 java，表示翻译的得到的是 java 语言
+contentType		设置响应头 contentType 的内容
+pageEncoding	设置当前 jsp 页面的编码
+import			给当前 jsp 页面导入需要使用的类包
+autoFlush		设置是否自动刷新 out 的缓冲区，默认为 true
+buffer			设置 out 的缓冲区大小，默认为 8KB
+errorPage		设置当前 jsp 发生错误后，需要跳转到哪个页面去显示错误信息
+isErrorPage		设置当前 jsp 页面是否是错误页面。是的话，就可以使用 exception 异常对象
+session			设置当前 jsp 页面是否获取 session 对象，默认为 true
+extends			给服务器厂商预留的 jsp 默认翻译的 servlet 继承于什么类
+```
+
+#### 自定义错误页面
+
+可以使用头部 page 声明，来定义该页面发生错误后要跳转的页面
+
+```jsp
+<%@ page errorPage="error/500.jsp" %>
+```
+
+也可以在web.xml中自定义跳转页面
+
+```xml
+<error-page>
+    <error-code>500</error-code>
+    <location>/error/500.jsp</location>
+</error-page>
+
+<error-page>
+    <error-code>404</error-code>
+    <location>/error/404.jsp</location>
+</error-page>
+```
+
+访问页面 jsp2.jsp 定义如下：
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page errorPage="error/500.jsp" %>
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+<%
+    int x = 1 / 0;	// 会发生错误
+%>
+</body>
+</html>
+```
+
+可知该页面会发生错误，会跳转到 error/500.jsp 错误页面中，error/500.jsp 页面定义如下
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>500错误</title>
+</head>
+<body>
+    <img src="${pageContext.request.contextPath}/img/500.png" alt="500">
+</body>
+</html>
+```
+
+使用 EL 表达式的方式访问图片路径，可以避免找不到图片的错误
+
+项目结构如下：
+
+![image-20210916151654746](https://gitee.com/cmz2000/album/raw/master/image/image-20210916151654746.png)
+
+### jsp公用页面
+
+可以使用 include 声明，来使用其他页面
+
+```jsp
+<%@ include file="common/header.jsp"%>
+```
+
+下面定义两个公共文件 header.jsp 和 footer.jsp，如下代码：
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<h1>我是header</h1>
+```
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<h1>我是footer</h1>
+```
+
+在 jsp3.jsp 中使用上述的两个公共 jsp 页面，代码和效果如下：
+
+```jsp
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<html>
+<head>
+    <title>Title</title>
+</head>
+<body>
+    <%@ include file="common/header.jsp"%>
+    <h1>页面主体</h1>
+    <%@ include file="common/footer.jsp"%>
+</body>
+</html>
+```
+
+![image-20210916152643928](https://gitee.com/cmz2000/album/raw/master/image/image-20210916152643928.png)
+
+使用 `<%@ include %>` 这种方法会让几个页面合为一个
+
+## 九大内置对象
+
+
+
+## JSP标签
+
+![image-20210916152844076](https://gitee.com/cmz2000/album/raw/master/image/image-20210916152844076.png)
