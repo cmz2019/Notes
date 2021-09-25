@@ -646,7 +646,275 @@ xmlns:p="http://www.springframework.org/schema/p"
 xmlns:c="http://www.springframework.org/schema/c"
 ```
 
+## 作用域 bean-scopes
 
+|    范围     |                             描述                             |
+| :---------: | :----------------------------------------------------------: |
+|  singleton  |  （默认）为每个Spring lOC容器的单个 Object 实例定义单个bean  |
+|  prototype  |             为任意数量的 Object 实例定义单个bean             |
+|   request   | 将单个bean定义范围限定为单个HTTP请求的生命周期。也就是说，每个HTTP请求都有自己的bean实例，该实例是在单个bean定义的后面创建的。仅在web-aware Spring `ApplicationContext` 的context中有效 |
+|   session   | 将单个bean定义范围限定为HTTP Session的生命周期。仅在web-aware Spring `ApplicationContext` 的context中有效 |
+| application | 将单个bean定义范围限定为ServletContext的生命周期。仅在web-aware Spring `ApplicationContext` 的context中有效 |
+|  websocket  | 将单个bean定义范围限定为 webSocket的生命周期。仅在web-aware Spring `ApplicationContext` 的context中有效 |
 
+### 单例 singleton
 
+<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210925145005670.png" alt="image-20210925145005670" style="zoom:80%;" />
 
+默认机制为单例模式，也可以显式指定 scope
+
+```xml
+<bean id="accountService" class="com.something.DefaultAccountService"/>
+
+<!-- the following is equivalent, though redundant (singleton scope is the default) -->
+<bean id="accountService" class="com.something.DefaultAccountService" scope="singleton"/>
+```
+
+### 原型 prototype
+
+<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210925150814868.png" alt="image-20210925150814868" style="zoom:80%;" />
+
+每次从容器中 get 的时候，都会产生一个新对象
+
+显式指定原型模式：
+
+```xml
+<bean id="accountService" class="com.something.DefaultAccountService" scope="prototype"/>
+```
+
+# 5、bean自动装配
+
++ 自动装配，是Spring满足bean依赖的一种方式
++ autowire
++ Spring会在上下文中自动寻找，并自动给bean装配属性
+
+在Spring中有三种装配的方式：
+
+1. 在 xml 中显式配置
+2. 在 java 中显式配置
+3. 隐式的自动装配【重要】
+
+## XML方式（传统）
+
+先定义三个类用于测试
+
+```java
+package com.strawberry.pojo;
+
+public class Dog {
+    public void shout() {
+        System.out.println("汪~");
+    }
+}
+```
+
+```java
+package com.strawberry.pojo;
+
+public class Cat {
+    public void shout() {
+        System.out.println("喵~");
+    }
+}
+```
+
+```java
+package com.strawberry.pojo;
+
+public class People {
+    private Cat cat;
+    private Dog dog;
+    private String name;
+
+	/* 省略get和set方法 */
+}
+```
+
+xml配置为
+
+```xml
+<bean id="cat" class="com.strawberry.pojo.Cat"/>
+<bean id="dog" class="com.strawberry.pojo.Dog"/>
+
+<bean id="people" class="com.strawberry.pojo.People">
+    <property name="name" value="草莓汁"/>
+    <property name="cat" ref="cat"/>
+    <property name="dog" ref="dog"/>
+</bean>
+```
+
+测试方法如下：
+
+```java
+@Test
+public void test() {
+    ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+    People people = context.getBean("people", People.class);
+    System.out.println(people.toString());
+    people.getCat().shout();
+    people.getDog().shout();
+}
+```
+
+## XML自动装配
+
+在xml配置文件中，设置bean的 `autowire` 进行自动装配
+
+### byName
+
+```xml
+<!--
+	byName: 会自动在容器上下文中查找和自己对象set方法后面的值对应beanId的bean
+	如 setCat() 方法，就回去找 beanId 为 cat 的 bean
+	如果更改了Dog类的beanId为dog1，则会报错，无法找到对应类
+-->
+<bean id="people" class="com.strawberry.pojo.People" autowire="byName">
+    <property name="name" value="草莓汁"/>
+</bean>
+```
+
+### byType
+
+```xml
+<!--
+	byType: 会自动在容器上下文中查找和自己对象set方法的参数对应类型的bean
+	但是该类型对象对应的bean不能重复，全局只能有一个
+	使用byType方法自动装配时，对应类型的bean可以省略id，因为用不到
+-->
+<bean id="people" class="com.strawberry.pojo.People" autowire="byType">
+    <property name="name" value="草莓汁"/>
+</bean>
+```
+
+小结：
+
++ byName的时候，需要保证所有bean的 id 唯一，并且这个id需要和自动注入的属性的set方法的方法名一致
++ byType的时候，需要保证所有bean的 class 唯一，并且这个class需要和自动注入的属性的类型一致
+
+## 注解自动装配
+
+使用注解自动装配须知：
+
+1. 导入约束：`xmlns:context="http://www.springframework.org/schema/context"`
+2. 配置注解的支持：`<context:annotation-config/>`
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+</beans>
+```
+
+### @Autowired
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:annotation-config/>
+
+    <bean id="cat" class="com.strawberry.pojo.Cat"/>
+    <bean id="dog" class="com.strawberry.pojo.Dog"/>
+    <bean id="people" class="com.strawberry.pojo.People"/>
+</beans>
+```
+
+```java
+package com.strawberry.pojo;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+public class People {
+    @Autowired
+    private Cat cat;
+    @Autowired
+    private Dog dog;
+    
+    private String name;
+
+    /* 省略set和get方法 */
+}
+```
+
++ 可以在 set 方法上使用该注解
++ 也可以直接在属性上使用
+  + 在属性上使用时，可以省略对应的 set 方法，前提是该属性在 IOC（Spring）容器中存在且符合 byType 要求或 byName 要求（先以 byType 方式查找，再以 byName 方式）
+  + 如果@Autowired自动装配的环境比较复杂，自动装配无法通过一个注解@Autowired完成，上述两个要求都不符合的时候，即没有对应的 id，并且有重复类型的bean，则需要显式的指定该属性使用哪一个bean进行注入，方法为 `@Qualifier(value = "bean-id")`
+
+```xml
+<bean id="dog2" class="com.strawberry.pojo.Dog"/>
+<bean id="dog1" class="com.strawberry.pojo.Dog"/>
+```
+
+```java
+public class People {
+    @Autowired
+    private Cat cat;
+    @Autowired
+    @Qualifier(value = "dog1")	// 使用@Qualifier配合@Autowired
+    private Dog dog;
+    private String name;
+}
+```
+
++ @Autowired有一个唯一参数required，默认参数值为true，若设置为false，`@Autowired(required = false)`，则表示自动装配的对象可以为 null
+  + 使用@Nullable修饰自动装配的对象也表示可以为null
+
+```java
+public class People {
+    @Autowired(required = false)
+    private Cat cat;
+    private Dog dog;
+    
+    @Autowired
+    public void setDog(@Nullable Dog dog) {
+        this.dog = dog;
+    }
+}
+```
+
+### @Resource
+
+@Resource的使用与@Autowired使用方法类似，与@Autowired不同的是@Resource先以 byName 方式查找，之后以 byType 方式查找
+
+```java
+public class People {
+    @Resource
+    private Cat cat;
+    @Resource
+    private Dog dog;
+    private String name;
+}
+```
+
+@Resource有很多参数
+
+![image-20210925225012760](https://gitee.com/cmz2000/album/raw/master/image/image-20210925225012760.png)
+
+可以使用 name 和 type 参数显式指定使用哪一个或哪一类 bean
+
+### 总结
+
+- @Autowired先以 byType 方式查找，之后以 byName 方式查找
+  - 可以定义在很多处位置，但是直接定义在成员上最方便
+  - 可以配合@Qualifier注解进行限定
+  - 内置required参数可以允许属性为null，和@Nullable功能一致
+  - 这个注解是Spring的
+
+- @Resource先以 byName 方式查找，之后以 byType 方式查找
+  - 内置很多参数，使用方便
+  - 这个注解是java的
