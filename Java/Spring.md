@@ -131,14 +131,7 @@ public class UserServiceImpl implements UserService {
 测试类为
 
 ```java
-public class MyTest {
-    public static void main(String[] args) {
-        // 用户实际调用的是业务层，他们不需要接触dao层
-        UserService userService = new UserServiceImpl();
-        ((UserServiceImpl) userService).setUserDao(new UserDaoMySQLImpl());
-        userService.getUser();
-    }
-}
+public class MyTest {    public static void main(String[] args) {        // 用户实际调用的是业务层，他们不需要接触dao层        UserService userService = new UserServiceImpl();        ((UserServiceImpl) userService).setUserDao(new UserDaoMySQLImpl());        userService.getUser();    }}
 ```
 
 + 之前，程序是主动创建对象，控制权在程序员手上
@@ -188,26 +181,7 @@ public class MyTest {
 Hello.java 代码如下：
 
 ```java
-package com.strawberry;
-
-public class Hello {
-    private String str;
-
-    public String getStr() {
-        return str;
-    }
-
-    public void setStr(String str) {
-        this.str = str;
-    }
-
-    @Override
-    public String toString() {
-        return "Hello{" +
-                "str='" + str + '\'' +
-                '}';
-    }
-}
+package com.strawberry;public class Hello {    private String str;    public String getStr() {        return str;    }    public void setStr(String str) {        this.str = str;    }    @Override    public String toString() {        return "Hello{" +                "str='" + str + '\'' +                '}';    }}
 ```
 
 可以看到定义了 str 变量，但是没有赋值
@@ -278,54 +252,25 @@ IOC是一种编程思想，由主动的编程变成被动的接收。一句话�
 Hello.java 代码如下：
 
 ```java
-package com.strawberry.pojo;
-
-public class Hello {
-    private String name;
-
-    public Hello() {
-        System.out.println("Hello的无参构造器");
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void show() {
-        System.out.println("name=" + name);
-    }
-}
+package com.strawberry.pojo;public class Hello {    private String name;    public Hello() {        System.out.println("Hello的无参构造器");    }    public String getName() {        return name;    }    public void setName(String name) {        this.name = name;    }    public void show() {        System.out.println("name=" + name);    }}
 ```
 
 在 beans.xml 中配置如下：
 
 ```xml
-<bean id="hello" class="com.strawberry.pojo.Hello">
-    <property name="name" value="草莓汁"/>
-</bean>
+<bean id="hello" class="com.strawberry.pojo.Hello">    <property name="name" value="草莓汁"/></bean>
 ```
 
 测试如下：
 
 ```java
-public class MyTest {
-    public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
-        Hello hello = (Hello) context.getBean("hello");
-        hello.show();
-    }
-}
+public class MyTest {    public static void main(String[] args) {        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");        Hello hello = (Hello) context.getBean("hello");        hello.show();    }}
 ```
 
 输出为：
 
 ```
-Hello的无参构造器
-name=草莓汁
+Hello的无参构造器name=草莓汁
 ```
 
 ### 有参构造
@@ -333,36 +278,23 @@ name=草莓汁
 #### 下标赋值
 
 ```java
-public Hello(String name) {
-    this.name = name;
-    System.out.println("Hello的有参构造器");
-}
+public Hello(String name) {    this.name = name;    System.out.println("Hello的有参构造器");}
 ```
 
 ```xml
-<!-- 第一种，下标赋值 -->
-<bean id="hello" class="com.strawberry.pojo.Hello">
-    <constructor-arg index="0" value="草莓汁"/>
-</bean>
+<!-- 第一种，下标赋值 --><bean id="hello" class="com.strawberry.pojo.Hello">    <constructor-arg index="0" value="草莓汁"/></bean>
 ```
 
 #### 类型赋值
 
 ```xml
-<!-- 第二种，类型赋值 -->
-<!-- 不建议使用，无法区分多个同类型的参数 -->
-<bean id="hello" class="com.strawberry.pojo.Hello">
-    <constructor-arg type="java.lang.String" value="草莓汁"/>
-</bean>
+<!-- 第二种，类型赋值 --><!-- 不建议使用，无法区分多个同类型的参数 --><bean id="hello" class="com.strawberry.pojo.Hello">    <constructor-arg type="java.lang.String" value="草莓汁"/></bean>
 ```
 
 #### 参数名赋值（推荐）
 
 ```xml
-<!-- 第三种，通过构造器参数名赋值 -->
-<bean id="hello" class="com.strawberry.pojo.Hello">
-    <constructor-arg name="name" value="草莓汁"/>
-</bean>
+<!-- 第三种，通过构造器参数名赋值 --><bean id="hello" class="com.strawberry.pojo.Hello">    <constructor-arg name="name" value="草莓汁"/></bean>
 ```
 
 # 3、Spring配置
@@ -407,9 +339,7 @@ ApplicationContext context = new ClassPathXmlApplicationContext("applicationCont
 或者只选择 applicationContext.xml 配置文件，将其他的配置文件导入 applicationContext.xml
 
 ```xml
-<import resource="beans.xml"/>
-<import resource="beans2.xml"/>
-<import resource="beans3.xml"/>
+<import resource="beans.xml"/><import resource="beans2.xml"/><import resource="beans3.xml"/>
 ```
 
 多个配置文件中存在相同内容的bean是没关系的（内容相同会被合并）
@@ -431,40 +361,13 @@ ApplicationContext context = new ClassPathXmlApplicationContext("applicationCont
 + 自定义复杂对象类型
 
 ```java
-package com.strawberry.pojo;
-
-public class Address {
-    private String address;
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-}
+package com.strawberry.pojo;public class Address {    private String address;    public String getAddress() {        return address;    }    public void setAddress(String address) {        this.address = address;    }}
 ```
 
 + 真实测试对象
 
 ```java
-package com.strawberry.pojo;
-
-import java.util.*;
-
-public class Student {
-    private String name;
-    private Address address;
-    private String[] books;
-    private List<String> hobbies;
-    private Map<String, String> card;
-    private Set<String> games;
-    private String wife;
-    private Properties info;
-
-	/* getter和setter方法，省略 */
-}
+package com.strawberry.pojo;import java.util.*;public class Student {    private String name;    private Address address;    private String[] books;    private List<String> hobbies;    private Map<String, String> card;    private Set<String> games;    private String wife;    private Properties info;	/* getter和setter方法，省略 */}
 ```
 
 + beans.xml
@@ -546,44 +449,17 @@ p表示property，用于存在==无参构造器==的bean对象的依赖注入操
 官网模板
 
 ```xml
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:p="http://www.springframework.org/schema/p"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans
-        https://www.springframework.org/schema/beans/spring-beans.xsd">
-
-    <bean name="john-classic" class="com.example.Person">
-        <property name="name" value="John Doe"/>
-        <property name="spouse" ref="jane"/>
-    </bean>
-
-    <bean name="john-modern"
-        class="com.example.Person"
-        p:name="John Doe"
-        p:spouse-ref="jane"/>
-
-    <bean name="jane" class="com.example.Person">
-        <property name="name" value="Jane Doe"/>
-    </bean>
-</beans>
+<beans xmlns="http://www.springframework.org/schema/beans"    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"    xmlns:p="http://www.springframework.org/schema/p"    xsi:schemaLocation="http://www.springframework.org/schema/beans        https://www.springframework.org/schema/beans/spring-beans.xsd">    <bean name="john-classic" class="com.example.Person">        <property name="name" value="John Doe"/>        <property name="spouse" ref="jane"/>    </bean>    <bean name="john-modern"        class="com.example.Person"        p:name="John Doe"        p:spouse-ref="jane"/>    <bean name="jane" class="com.example.Person">        <property name="name" value="Jane Doe"/>    </bean></beans>
 ```
 
 #### 实例演示
 
 ```java
-package com.strawberry.pojo;
-
-public class User {
-    private String name;
-    private int age;
-
-    /* 省略getter和setter */
-}
+package com.strawberry.pojo;public class User {    private String name;    private int age;    /* 省略getter和setter */}
 ```
 
 ```xml
-<!-- p命名空间注入，可以直接注入属性的值，property -->
-<bean id="user" class="com.strawberry.pojo.User" p:name="草莓汁" p:age="18"/>
+<!-- p命名空间注入，可以直接注入属性的值，property --><bean id="user" class="com.strawberry.pojo.User" p:name="草莓汁" p:age="18"/>
 ```
 
 ### c-namespace
@@ -642,8 +518,7 @@ public class User {
 **注意**：p命名和c命名空间不能直接使用，需要导入xml约束
 
 ```xml
-xmlns:p="http://www.springframework.org/schema/p"
-xmlns:c="http://www.springframework.org/schema/c"
+xmlns:p="http://www.springframework.org/schema/p"xmlns:c="http://www.springframework.org/schema/c"
 ```
 
 ## 作用域 bean-scopes
@@ -664,10 +539,7 @@ xmlns:c="http://www.springframework.org/schema/c"
 默认机制为单例模式，也可以显式指定 scope
 
 ```xml
-<bean id="accountService" class="com.something.DefaultAccountService"/>
-
-<!-- the following is equivalent, though redundant (singleton scope is the default) -->
-<bean id="accountService" class="com.something.DefaultAccountService" scope="singleton"/>
+<bean id="accountService" class="com.something.DefaultAccountService"/><!-- the following is equivalent, though redundant (singleton scope is the default) --><bean id="accountService" class="com.something.DefaultAccountService" scope="singleton"/>
 ```
 
 ### 原型 prototype
@@ -699,23 +571,11 @@ xmlns:c="http://www.springframework.org/schema/c"
 先定义三个类用于测试
 
 ```java
-package com.strawberry.pojo;
-
-public class Dog {
-    public void shout() {
-        System.out.println("汪~");
-    }
-}
+package com.strawberry.pojo;public class Dog {    public void shout() {        System.out.println("汪~");    }}
 ```
 
 ```java
-package com.strawberry.pojo;
-
-public class Cat {
-    public void shout() {
-        System.out.println("喵~");
-    }
-}
+package com.strawberry.pojo;public class Cat {    public void shout() {        System.out.println("喵~");    }}
 ```
 
 ```java
@@ -918,3 +778,88 @@ public class People {
 - @Resource先以 byName 方式查找，之后以 byType 方式查找
   - 内置很多参数，使用方便
   - 这个注解是java的
+
+# 6、使用注解注入
+
+在 applicationContext.xml 配置文件中指定要扫描的包，才能使用注解
+
+```xml
+<context:component-scan base-package="com.strawberry.pojo"/>
+```
+
+## bean
+
+测试类为 User.java
+
+```java
+package com.strawberry.pojo;
+
+public class User {
+    public String name = "草莓汁";
+}
+```
+
+### xml方式
+
+一种方式是直接在xml中注册bean
+
+```xml
+<bean id="user" class="com.strawberry.pojo.User"/>
+```
+
+### @Component
+
+另一种方式是在 java 代码中使用注解 @Component 修饰类
+
+```java
+package com.strawberry.pojo;
+
+@Component
+public class User {
+    public String name = "草莓汁";
+}
+```
+
+这两种方式等价
+
+## 属性
+
+### xml方式
+
+```xml
+<bean id="user" class="com.strawberry.pojo.User">
+    <property name="name" value="草莓汁"/>
+</bean>
+```
+
+### @Value
+
+使用 @Value 注解，既可以修饰属性，也可以修饰对应的 set 方法
+
+```java
+package com.strawberry.pojo;
+
+@Component
+public class User {
+//    @Value("草莓汁")
+    public String name;
+    
+    @Value("草莓汁")
+    public void setName(String name) {
+        this.name = name;
+    }
+}
+```
+
+这两种方式等价
+
+## 衍生的注解
+
+@Component有几个衍生注解，我们在web开发中，会按照MVC三层架构分层。
+
++ dao【@Repository】
++ service【@Service】
++ controller【@Controller】
+
+这四个注解功能是一样的，都是表示将某个类注册到Spring容器中装配Bean，只是习惯上每个层都使用对应的注解
+
