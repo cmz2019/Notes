@@ -131,7 +131,14 @@ public class UserServiceImpl implements UserService {
 测试类为
 
 ```java
-public class MyTest {    public static void main(String[] args) {        // 用户实际调用的是业务层，他们不需要接触dao层        UserService userService = new UserServiceImpl();        ((UserServiceImpl) userService).setUserDao(new UserDaoMySQLImpl());        userService.getUser();    }}
+public class MyTest {
+    public static void main(String[] args) {
+        // 用户实际调用的是业务层，他们不需要接触dao层
+        UserService userService = new UserServiceImpl();
+        ((UserServiceImpl) userService).setUserDao(new UserDaoMySQLImpl());
+        userService.getUser();
+    }
+}
 ```
 
 + 之前，程序是主动创建对象，控制权在程序员手上
@@ -181,7 +188,26 @@ public class MyTest {    public static void main(String[] args) {        // 用�
 Hello.java 代码如下：
 
 ```java
-package com.strawberry;public class Hello {    private String str;    public String getStr() {        return str;    }    public void setStr(String str) {        this.str = str;    }    @Override    public String toString() {        return "Hello{" +                "str='" + str + '\'' +                '}';    }}
+package com.strawberry;
+
+public class Hello {
+    private String str;
+
+    public String getStr() {
+        return str;
+    }
+
+    public void setStr(String str) {
+        this.str = str;
+    }
+
+    @Override
+    public String toString() {
+        return "Hello{" +
+                "str='" + str + '\'' +
+                '}';
+    }
+}
 ```
 
 可以看到定义了 str 变量，但是没有赋值
@@ -258,19 +284,28 @@ package com.strawberry.pojo;public class Hello {    private String name;    publ
 在 beans.xml 中配置如下：
 
 ```xml
-<bean id="hello" class="com.strawberry.pojo.Hello">    <property name="name" value="草莓汁"/></bean>
+<bean id="hello" class="com.strawberry.pojo.Hello">
+    <property name="name" value="草莓汁"/>
+</bean>
 ```
 
 测试如下：
 
 ```java
-public class MyTest {    public static void main(String[] args) {        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");        Hello hello = (Hello) context.getBean("hello");        hello.show();    }}
+public class MyTest {
+    public static void main(String[] args) {
+        ApplicationContext context = new ClassPathXmlApplicationContext("beans.xml");
+        Hello hello = (Hello) context.getBean("hello");
+        hello.show();
+    }
+}
 ```
 
 输出为：
 
 ```
-Hello的无参构造器name=草莓汁
+Hello的无参构造器
+name=草莓汁
 ```
 
 ### 有参构造
@@ -278,7 +313,10 @@ Hello的无参构造器name=草莓汁
 #### 下标赋值
 
 ```java
-public Hello(String name) {    this.name = name;    System.out.println("Hello的有参构造器");}
+public Hello(String name) {
+    this.name = name;
+    System.out.println("Hello的有参构造器");
+}
 ```
 
 ```xml
@@ -361,13 +399,40 @@ ApplicationContext context = new ClassPathXmlApplicationContext("applicationCont
 + 自定义复杂对象类型
 
 ```java
-package com.strawberry.pojo;public class Address {    private String address;    public String getAddress() {        return address;    }    public void setAddress(String address) {        this.address = address;    }}
+package com.strawberry.pojo;
+
+public class Address {
+    private String address;
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+}
 ```
 
 + 真实测试对象
 
 ```java
-package com.strawberry.pojo;import java.util.*;public class Student {    private String name;    private Address address;    private String[] books;    private List<String> hobbies;    private Map<String, String> card;    private Set<String> games;    private String wife;    private Properties info;	/* getter和setter方法，省略 */}
+package com.strawberry.pojo;
+
+import java.util.*;
+
+public class Student {
+    private String name;
+    private Address address;
+    private String[] books;
+    private List<String> hobbies;
+    private Map<String, String> card;
+    private Set<String> games;
+    private String wife;
+    private Properties info;
+
+	/* getter和setter方法，省略 */
+}
 ```
 
 + beans.xml
@@ -571,11 +636,23 @@ xmlns:p="http://www.springframework.org/schema/p"xmlns:c="http://www.springframe
 先定义三个类用于测试
 
 ```java
-package com.strawberry.pojo;public class Dog {    public void shout() {        System.out.println("汪~");    }}
+package com.strawberry.pojo;
+
+public class Dog {
+    public void shout() {
+        System.out.println("汪~");
+    }
+}
 ```
 
 ```java
-package com.strawberry.pojo;public class Cat {    public void shout() {        System.out.println("喵~");    }}
+package com.strawberry.pojo;
+
+public class Cat {
+    public void shout() {
+        System.out.println("喵~");
+    }
+}
 ```
 
 ```java
@@ -862,4 +939,261 @@ public class User {
 + controller【@Controller】
 
 这四个注解功能是一样的，都是表示将某个类注册到Spring容器中装配Bean，只是习惯上每个层都使用对应的注解
+
+```java
+@Repository
+public class UserDao {
+}
+```
+
+```java
+@Service
+public class UserService {
+}
+```
+
+```java
+@Controller
+public class UserController {
+}
+```
+
+## 自动装配
+
+[见上文](#注解自动装配)
+
+## 作用域
+
+```java
+@Component
+@Scope("prototype")
+public class User {
+    public String name;
+}
+```
+
+等价于
+
+```xml
+<bean id="user" class="com.strawberry.pojo.User" scope="prototype"/>
+```
+
+## 小结
+
+xml与注解：
+
++ XML适用于任何场合，维护简单
++ 注解：不是自己的类使用不了，维护相对复杂，
+
+最佳配合方法
+
++ xml管理Bean
+
++ 注解只负责完成属性注入（切记开启注解的支持和指定扫描的包）
+
+```xml
+<!--指定要扫描的包，这个包下的注解就会生效-->
+<context:component-scan base-package="com.strawberry"/>
+<context:annotation-config/>
+```
+
+# 7、使用Java的方式配置Spring
+
+自定义 User.java 实体类
+
+```java
+// 这里这个注解的意思，就是说明这个类被Spring接管了，注册到了容器中
+@Component
+public class User {
+    private String name;
+
+    @Value("strawberry") // 属性注入值
+    public void setName(String name) {
+        this.name = name;
+    }
+	
+    /* 省略get方法和toString方法 */
+}
+```
+
+实现一个 JavaConfig 配置类
+
+```java
+// @Configuration也会Spring容器托管，注册到容器中
+// 本质上就是一个@Component
+// @Configuration代表这是一个配置类，就和 beans.xml 一样
+@Configuration
+@ComponentScan("com.strawberry.pojo")
+public class Config {
+
+    // 注册一个bean，相当于我们之前写的一个bean标签
+    // 这个方法的名字，相当于bean标签中的id属性
+    // 这个方法的返回值，相当于bean标签中的class属性
+    @Bean
+    public User getUser() {
+        return new User(); // 返回要注入到bean的对象
+    }
+}
+```
+
+- 经过@Configuration的修饰 Config 已经成为一个配置类了，类似于 Context.xml 配置文件
+- @ComponentScan设置查找范围
+- @Bean相当于之前写的bean标签，所修饰的方法的方法名就是bean-id
+- 方法的返回值相当于 bean-class
+
+测试方法如下：
+
+```java
+@Test
+public void test() {
+    //如果完全使用了配置类方式去做，我们就只能通过 AnnotationConfig 上下文来获取容器，通过配置类的class对象加载
+    ApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
+    User user = context.getBean("getUser", User.class);
+    System.out.println(user);
+}
+```
+
++ 如果有多个@Configuration，可以使用@Import注解，加入配置类
+
+```java
+@Configuration
+@ComponentScan("com.strawberry.pojo")
+@Import(Config2.class)
+public class Config {
+    @Bean
+    public User getUser() {
+        return new User();
+    }
+}
+```
+
+这种纯Java的配置方式，在SpringBoot中随处可见
+
+# 8、AOP
+
+## 代理模式
+
+代理模式是SpringAOP的底层！
+
+代理模式分类：
+
++ 静态代理
++ 动态代理
+
+![image-20210927165240871](https://gitee.com/cmz2000/album/raw/master/image/image-20210927165240871.png)
+
+### 静态代理
+
+- 抽象角色：一般会使用接口或者抽象类来解决
+- 真实角色：被代理的角色
+- 代理角色：代理真实角色，代理真实角色后，我们一般会做一些附属操作
+- 客户：访问代理对象的人
+
+#### 租房中介例子
+
+通过租房例子来理解：
+
+```java
+// 租房
+public interface Rent {
+    public void rent();
+}
+```
+
+```java
+// 房东
+public class Landlord implements Rent {
+    @Override
+    public void rent() {
+        System.out.println("房东要出租房子！");
+    }
+}
+```
+
+```java
+public class Proxy implements Rent {
+    private Landlord landlord;
+
+    public Proxy() {
+    }
+
+    public Proxy(Landlord landlord) {
+        this.landlord = landlord;
+    }
+
+    @Override
+    public void rent() { // 可以扩展业务
+        seeHouse();
+        landlord.rent();
+        fare();
+    }
+
+    // 看房
+    public void seeHouse() {
+        System.out.println("中介带你看房子！");
+    }
+
+    // 中介费
+    public void fare() {
+        System.out.println("收中介费");
+    }
+}
+```
+
+```java
+public class Client {
+    public static void main(String[] args) {
+        // 房东
+        Landlord landlord = new Landlord();
+        // 代理
+        Proxy proxy = new Proxy(landlord);
+        // 租客不用面对房东，直接找中介即可
+        proxy.rent();
+    }
+}
+```
+
+客户找中介，中介找房东，实现租房的方法，还能添加一些附属操作
+
+代码步骤：
+
+- 接口
+- 真实角色
+- 代理角色
+- 客户端访问角色
+
+#### 优缺点
+
+代理模式的好处：
+
+- 可以使真实角色的操作更加纯粹，不用去关注一些公共的业务
+- 公共业务交给代理角色，实现业务分工
+- 公共业务发生扩展时，方便管理
+
+缺点：
+
+- 一个真实角色就会产生一个代理角色，代码量增多
+
+#### 加深理解
+
+![image-20210927173515597](https://gitee.com/cmz2000/album/raw/master/image/image-20210927173515597.png)
+
+如果一条线已经做出来了，突然要在中间加一个功能，不能去修改原有的业务代码（这在公司中是大忌），只能在原有的基础上添加功能，通过代理，调用的是原有的功能，但是在调用原有的功能的同时能像上面的租房的例子一样，增加一些功能。
+
+### 动态代理
+
++ 动态代理和静态代理的角色一样
++ 静态代理每代理一个角色就要重新编写一个静态代理对象，代码量十分庞大
++ 动态代理的代理类是动态生成的，不是直接写好的
+
+动态代理分两大类：基于接口的动态代理、基于类的动态代理
+
+- 基于接口的动态代理：JDK原生的动态代理
+- 基于类的动态代理：cglib
+- 基于java字节码实现：JavaAssist（现在用的比较多）
+
+需要了解两个类：Proxy，InvocationHandle
+
+- Proxy：代理
+- InvocationHandle：调用处理程序
 
