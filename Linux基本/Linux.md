@@ -137,7 +137,7 @@
 
 + `who`，列出当前已登录入系统的用户信息
 
-  ![image-20210623162639555](https://gitee.com/cmz2000/album/raw/master/image/image-20210623162639555.png)
+  ![image-20210623162639555](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623162639555.png)
 
   + 第一列：用户名；第二列：终端设备的设备文件名
   + 设备在文件系统中有一个文件名（同普通磁盘文件不同的是文件类型属于特殊文件），设备文件一般放于目录 /dev 下
@@ -160,13 +160,13 @@
   + 近期1分钟，5分钟，15分钟内系统CPU的负载
     + 平均调度队列长度
 
-![image-20210623162832054](https://gitee.com/cmz2000/album/raw/master/image/image-20210623162832054.png)
+![image-20210623162832054](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623162832054.png)
 
 ### top
 
 作用：列出资源占用排名靠前的进程
 
-![image-20210623163005443](https://gitee.com/cmz2000/album/raw/master/image/image-20210623163005443.png)
+![image-20210623163005443](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623163005443.png)
 
 + VIRT 进程逻辑地址空间大小（virtual）
 + RES 驻留内存数（Resident），也就是占用物理内存数
@@ -186,15 +186,15 @@
 + `-f` 选项：以 full 格式列出每一个进程（控制列的数目）
 + `-l` 选项：以 long 格式列出每一个进程（控制列的数目）
 
-![image-20210623163657438](https://gitee.com/cmz2000/album/raw/master/image/image-20210623163657438.png)
+![image-20210623163657438](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623163657438.png)
 
-<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210623163722895.png" alt="image-20210623163722895" style="zoom:67%;" />
+<img src="https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623163722895.png" alt="image-20210623163722895" style="zoom:67%;" />
 
 ### free
 
 作用：了解内存使用情况
 
-![image-20210623164354170](https://gitee.com/cmz2000/album/raw/master/image/image-20210623164354170.png)
+![image-20210623164354170](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623164354170.png)
 
 + 内存总量 4GB, 空闲 309MB。Linux 为提高效率，利用程序暂时不用的内存，缓冲读写过的磁盘信息。当前有 717MB 的 buffer / cache。
 + 不计 buffers / cache,系统有实际可利用资源 734MB
@@ -204,9 +204,9 @@
 
 作用：了解系统负载
 
-![image-20210623165029470](https://gitee.com/cmz2000/album/raw/master/image/image-20210623165029470.png)
+![image-20210623165029470](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623165029470.png)
 
-<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210623164724206.png" alt="image-20210623164724206" style="zoom:67%;" />
+<img src="https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623164724206.png" alt="image-20210623164724206" style="zoom:67%;" />
 
 # 二、文本文件处理
 
@@ -227,7 +227,7 @@
 
 满屏后，显示--more--或--more--(15%)，可以使用 more 命令：
 
-![image-20210621144815902](https://gitee.com/cmz2000/album/raw/master/image/image-20210621144815902.png)
+![image-20210621144815902](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621144815902.png)
 
 **less**
 
@@ -324,9 +324,9 @@ less is more
 **举例**
 
 + `cat telnos | tr UVX uvx`
-+ 例：用 [] 指定一个集合
++ 例：用 \[\] 指定一个集合
   `cat report | tr '[a-z]' '[A-Z]'` 将小写字母改为大写字母
-+ 例：用 \ 加三个八进制数字（类似 C 语言）表示一字符
++ 例：用 \\ 加三个八进制数字（类似 C 语言）表示一字符
   `cat file1 | tr % '\012'` 将%改为换行符，注意不要漏掉必需的单引号
 
 ### uniq
@@ -380,7 +380,7 @@ less is more
 
 `\. \* \$ \^ \[ \\`
 
-正则表达式 \\* 与字符串 * 匹配，与字符串 \\* 不匹配
+正则表达式 \\\* 与字符串 \* 匹配，与字符串 \\\* 不匹配
 
 转义字符后除以上六种之外的不该出现其他字符，例如：不该出现 \u，这样的组合被视为undefined（未定义的），后出的软件有可能会有特殊的解释
 
@@ -419,17 +419,17 @@ less is more
 
 ##### 用 \^ 表示补集
 
-+ \^ 在开头,则表示与集合内字符之外的任意字符匹配
++ \^ 在开头，则表示与集合内字符之外的任意字符匹配
   + `[^a-z]` 匹配任一非小写字母
   + `[^][]` 匹配任一非中括号字符
-+ \^ 不在开头,则失去其表示补集的意义
++ \^ 不在开头，则失去其表示补集的意义
   + `[a-z^]` 能匹配 27 个单字符
 
 ##### 举例
 
-![image-20210621154836478](https://gitee.com/cmz2000/album/raw/master/image/image-20210621154836478.png)
+![image-20210621154836478](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621154836478.png)
 
-![image-20210621154904429](https://gitee.com/cmz2000/album/raw/master/image/image-20210621154904429.png)
+![image-20210621154904429](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621154904429.png)
 
 ### 正则表达式扩展
 
@@ -513,7 +513,7 @@ Global regular expression print
 
 **正则表达式替换**
 
-![image-20210621162545167](https://gitee.com/cmz2000/album/raw/master/image/image-20210621162545167.png)
+![image-20210621162545167](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621162545167.png)
 
 ### 复杂筛选及加工 awk
 
@@ -542,15 +542,15 @@ Global regular expression print
 
 **awk描述的条件**
 
-![image-20210621190055677](https://gitee.com/cmz2000/album/raw/master/image/image-20210621190055677.png)
+![image-20210621190055677](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621190055677.png)
 
 **awk描述的动作**
 
-![image-20210621190107147](https://gitee.com/cmz2000/album/raw/master/image/image-20210621190107147.png)
+![image-20210621190107147](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621190107147.png)
 
 **举例**
 
-![image-20210621190147914](https://gitee.com/cmz2000/album/raw/master/image/image-20210621190147914.png)
+![image-20210621190147914](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621190147914.png)
 
 ## 3、文件比对
 
@@ -597,11 +597,11 @@ Global regular expression print
   + 列出内容时，大于号后边的内容是需要在 file1 文件中增加的内容；小于号后边的内容是需从 file1 中删除的内容
 + normal 格式文件转化指令如下表
 
-![image-20210621193011646](https://gitee.com/cmz2000/album/raw/master/image/image-20210621193011646.png)
+![image-20210621193011646](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621193011646.png)
 
 **diff -u举例**
 
-![image-20210621193413002](https://gitee.com/cmz2000/album/raw/master/image/image-20210621193413002.png)
+![image-20210621193413002](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621193413002.png)
 
 ## 4、vi 编辑器
 
@@ -635,7 +635,7 @@ Global regular expression print
   + 命令 i 在当前字符前插入正文段，直至按 Esc 键 (insert)
   + 命令 a 在当前字符后插入正文段，直至按 Esc 键 (append)
 
-<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210621195017049.png" alt="image-20210621195017049" style="zoom:50%;" />
+<img src="https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210621195017049.png" alt="image-20210621195017049" style="zoom:50%;" />
 
 #### 光标移动
 
@@ -850,7 +850,7 @@ Global regular expression print
 
 #### 注意
 
-![image-20210623171452772](https://gitee.com/cmz2000/album/raw/master/image/image-20210623171452772.png)
+![image-20210623171452772](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623171452772.png)
 
 ### 处理过程
 
@@ -864,7 +864,7 @@ Global regular expression print
   + 管理系统资源（包括内存，磁盘等）运行在核心态
   + 通过软中断方式对用户态进程提供系统调用接口
 
-![image-20210623171655566](https://gitee.com/cmz2000/album/raw/master/image/image-20210623171655566.png)
+![image-20210623171655566](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623171655566.png)
 
 #### shell文件名通配符处理
 
@@ -957,9 +957,9 @@ Global regular expression print
 
 **举例**：
 
-![image-20210623183434049](https://gitee.com/cmz2000/album/raw/master/image/image-20210623183434049.png)
+![image-20210623183434049](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623183434049.png)
 
-![image-20210623185902666](https://gitee.com/cmz2000/album/raw/master/image/image-20210623185902666.png)
+![image-20210623185902666](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623185902666.png)
 
 #### mv
 
@@ -994,7 +994,7 @@ Global regular expression print
 
 **显式区分命令选项和处理对象**
 
-![image-20210623184411866](https://gitee.com/cmz2000/album/raw/master/image/image-20210623184411866.png)
+![image-20210623184411866](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623184411866.png)
 
 ### 目录管理
 
@@ -1099,7 +1099,7 @@ Global regular expression print
 
 ### 批量处理文件
 
-![image-20210623194146398](https://gitee.com/cmz2000/album/raw/master/image/image-20210623194146398.png)
+![image-20210623194146398](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623194146398.png)
 
 #### xargs
 
@@ -1180,7 +1180,7 @@ Global regular expression print
 
 ## 4、文件系统
 
-![image-20210623205344386](https://gitee.com/cmz2000/album/raw/master/image/image-20210623205344386.png)
+![image-20210623205344386](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623205344386.png)
 
 ### 创建与安装
 
@@ -1214,11 +1214,11 @@ Global regular expression print
 
 `stat test.c`
 
-![image-20210623205945247](https://gitee.com/cmz2000/album/raw/master/image/image-20210623205945247.png)
+![image-20210623205945247](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623205945247.png)
 
 ## 5、文件和目录的权限
 
-![image-20210623210535588](https://gitee.com/cmz2000/album/raw/master/image/image-20210623210535588.png)
+![image-20210623210535588](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623210535588.png)
 
 ### 相关命令
 
@@ -1236,7 +1236,7 @@ Global regular expression print
 
   + 例：`chmod 644 xyz1 xyz2`
 
-  ![image-20210623211133017](https://gitee.com/cmz2000/album/raw/master/image/image-20210623211133017.png)
+  ![image-20210623211133017](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623211133017.png)
 
 注意：只允许文件主和超级用户修改文件权限
 
@@ -1253,7 +1253,7 @@ Global regular expression print
 + `umask`，打印当前的 umask 值
 + `umask 022`，将 umask 值设置为八进制的022
 
-![image-20210623211612067](https://gitee.com/cmz2000/album/raw/master/image/image-20210623211612067.png)
+![image-20210623211612067](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210623211612067.png)
 
 # 四、bash及脚本程序设计
 
@@ -1267,7 +1267,7 @@ Global regular expression print
 
 查看先前键入的命令
 
-![image-20210624092235143](https://gitee.com/cmz2000/album/raw/master/image/image-20210624092235143.png)
+![image-20210624092235143](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624092235143.png)
 
 #### 历史替换
 
@@ -1279,7 +1279,7 @@ Global regular expression print
 
 #### alias
 
-![image-20210624092641493](https://gitee.com/cmz2000/album/raw/master/image/image-20210624092641493.png)
+![image-20210624092641493](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624092641493.png)
 
 #### TAB键补全
 
@@ -1290,45 +1290,45 @@ Global regular expression print
 
 #### <filename
 
-![image-20210624093047738](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093047738.png)
+![image-20210624093047738](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624093047738.png)
 
 #### <<word
 
-![image-20210624093128168](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093128168.png)
+![image-20210624093128168](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624093128168.png)
 
 #### <<<word
 
-![image-20210624093142677](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093142677.png)
+![image-20210624093142677](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624093142677.png)
 
 ### 输出重定向与管道
 
-![image-20210624093204481](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093204481.png)
+![image-20210624093204481](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624093204481.png)
 
 #### stdout输出重定向
 
-![image-20210624093448704](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093448704.png)
+![image-20210624093448704](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624093448704.png)
 
 #### stderr输出重定向
 
-![image-20210624093515146](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093515146.png)
+![image-20210624093515146](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624093515146.png)
 
 #### 举例
 
-![image-20210624093715805](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093715805.png)
+![image-20210624093715805](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624093715805.png)
 
-![image-20210624093729828](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093729828.png)
+![image-20210624093729828](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624093729828.png)
 
 ### 管道
 
-![image-20210624093804186](https://gitee.com/cmz2000/album/raw/master/image/image-20210624093804186.png)
+![image-20210624093804186](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624093804186.png)
 
 ## 2、变量
 
 ### 赋值与引用
 
-![image-20210624094811543](https://gitee.com/cmz2000/album/raw/master/image/image-20210624094811543.png)
+![image-20210624094811543](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624094811543.png)
 
-![image-20210624094838149](https://gitee.com/cmz2000/album/raw/master/image/image-20210624094838149.png)
+![image-20210624094838149](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624094838149.png)
 
 ## 3、替换
 
@@ -1336,21 +1336,21 @@ Shell 的替换工作：**先替换命令行再执行命令**
 
 ### 文件名生成
 
-![image-20210624095229462](https://gitee.com/cmz2000/album/raw/master/image/image-20210624095229462.png)
+![image-20210624095229462](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624095229462.png)
 
 ### 命令替换
 
 #### 反撇号 \`
 
-![image-20210624095319370](https://gitee.com/cmz2000/album/raw/master/image/image-20210624095319370.png)
+![image-20210624095319370](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624095319370.png)
 
 #### \$\(\)格式
 
-![image-20210624095428221](https://gitee.com/cmz2000/album/raw/master/image/image-20210624095428221.png)
+![image-20210624095428221](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624095428221.png)
 
 ### 位置参数
 
-![image-20210624095546592](https://gitee.com/cmz2000/album/raw/master/image/image-20210624095546592.png)
+![image-20210624095546592](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624095546592.png)
 
 
 
@@ -1364,11 +1364,11 @@ Shell 的替换工作：**先替换命令行再执行命令**
 
 #### 内部命令 \$?
 
-![image-20210624101038229](https://gitee.com/cmz2000/album/raw/master/image/image-20210624101038229.png)
+![image-20210624101038229](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624101038229.png)
 
 #### 复合逻辑
 
-![image-20210624101125811](https://gitee.com/cmz2000/album/raw/master/image/image-20210624101125811.png)
+![image-20210624101125811](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624101125811.png)
 
 ### test 和 方括号命令 \[
 
@@ -1381,39 +1381,39 @@ Shell 的替换工作：**先替换命令行再执行命令**
 
 #### 文件特性检测
 
-![image-20210624102226812](https://gitee.com/cmz2000/album/raw/master/image/image-20210624102226812.png)
+![image-20210624102226812](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624102226812.png)
 
 #### 比较
 
-![image-20210624102852550](https://gitee.com/cmz2000/album/raw/master/image/image-20210624102852550.png)
+![image-20210624102852550](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624102852550.png)
 
-![image-20210624103007751](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103007751.png)
+![image-20210624103007751](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624103007751.png)
 
 #### 复合条件
 
-![image-20210624103025596](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103025596.png)
+![image-20210624103025596](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624103025596.png)
 
 ### 命令组合 \{\} 与 \(\)
 
-![image-20210624103226871](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103226871.png)
+![image-20210624103226871](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624103226871.png)
 
-![image-20210624103238293](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103226871.png)
+![image-20210625121308752](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210625121308752.png)
 
-![image-20210624103311757](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103311757.png)
+![image-20210624103311757](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624103311757.png)
 
 ### 条件分支
 
 #### if
 
-![image-20210624103423101](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103423101.png)
+![image-20210624103423101](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624103423101.png)
 
 ##### 举例
 
-![image-20210624103522258](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103522258.png)
+![image-20210624103522258](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624103522258.png)
 
 #### case
 
-![image-20210624103535135](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103535135.png)
+![image-20210624103535135](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624103535135.png)
 
 ## 6、循环
 
@@ -1421,71 +1421,71 @@ Shell 的替换工作：**先替换命令行再执行命令**
 
 作用：算术运算、关系运算、逻辑运算、正则表达式运算
 
-![image-20210624103928490](https://gitee.com/cmz2000/album/raw/master/image/image-20210624103928490.png)
+![image-20210624103928490](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624103928490.png)
 
-![image-20210624104327870](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104327870.png)
+![image-20210624104327870](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624104327870.png)
 
 #### 正则表达式运算
 
-![image-20210624104426585](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104406013.png)
+![image-20210624104426585](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624104406013.png)
 
 ### 内部命令 eval
 
-![image-20210624104459462](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104459462.png)
+![image-20210624104459462](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624104459462.png)
 
 ### while 循环
 
-![image-20210624104627820](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104627820.png)
+![image-20210624104627820](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624104627820.png)
 
 多个命令放到一行时，要用分号隔开
 
 ### for 循环
 
-![image-20210624104746465](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104746465.png)
+![image-20210624104746465](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624104746465.png)
 
 ## 7、函数
 
-![image-20210624104814777](https://gitee.com/cmz2000/album/raw/master/image/image-20210624104814777.png)
+![image-20210624104814777](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624104814777.png)
 
 # 五、重定向与管道
 
-![image-20210624083231346](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083231346.png)
+![image-20210624083231346](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624083231346.png)
 
-![image-20210624083334698](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083334698.png)
+![image-20210624083334698](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624083334698.png)
 
 ## 1、重定向
 
-![image-20210624083609746](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083609746.png)
+![image-20210624083609746](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624083609746.png)
 
 ## 2、管道
 
 ### 创建
 
-![image-20210624083737990](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083737990.png)
+![image-20210624083737990](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624083737990.png)
 
 ### 写
 
-![image-20210624083756234](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083756234.png)
+![image-20210624083756234](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624083756234.png)
 
 ### 读
 
-![image-20210624083816776](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083816776.png)
+![image-20210624083816776](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624083816776.png)
 
 ### 关闭
 
-![image-20210624083830567](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083830567.png)
+![image-20210624083830567](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624083830567.png)
 
 
 
 ### 举例
 
-![image-20210624083917476](https://gitee.com/cmz2000/album/raw/master/image/image-20210624083917476.png)
+![image-20210624083917476](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624083917476.png)
 
-![image-20210624084104800](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084104800.png)
+![image-20210624084104800](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624084104800.png)
 
-![image-20210624084118565](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084118565.png)
+![image-20210624084118565](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624084118565.png)
 
-![image-20210624084205246](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084205246.png)
+![image-20210624084205246](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624084205246.png)
 
 ## 3、一些命令
 
@@ -1497,9 +1497,9 @@ Shell 的替换工作：**先替换命令行再执行命令**
 
 **举例**：
 
-![image-20210624084726950](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084726950.png)
+![image-20210624084726950](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624084726950.png)
 
-![image-20210624084811305](https://gitee.com/cmz2000/album/raw/master/image/image-20210624084811305.png)
+![image-20210624084811305](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624084811305.png)
 
 
 
@@ -1525,7 +1525,7 @@ Shell 的替换工作：**先替换命令行再执行命令**
 
 **使用方法**：`int kill(int pid, int sig)`，返回值：0 成功，-1 失败
 
-![image-20210624085431899](https://gitee.com/cmz2000/album/raw/master/image/image-20210624085431899.png)
+![image-20210624085431899](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624085431899.png)
 
 # 六、进程控制
 
@@ -1539,17 +1539,19 @@ Shell 的替换工作：**先替换命令行再执行命令**
 
 ### exec
 
-![image-20210624091051583](https://gitee.com/cmz2000/album/raw/master/image/image-20210624091051583.png)
+![image-20210624091051583](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624091051583.png)
 
-![image-20210624091102630](https://gitee.com/cmz2000/album/raw/master/image/image-20210624091102630.png)
+![image-20210624091102630](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624091102630.png)
 
 ### wait
 
-![image-20210624091432426](https://gitee.com/cmz2000/album/raw/master/image/image-20210624091432426.png)
+![image-20210624091432426](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624091432426.png)
 
 ### system
 
-![image-20210624091604961](https://gitee.com/cmz2000/album/raw/master/image/image-20210624091604961.png)
+![image-20210624091604961](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210624091604961.png)
+
+# 七、Socket
 
 
 
