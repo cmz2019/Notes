@@ -2,13 +2,13 @@
 
 ## 概念
 
-文件，对我们并不陌生，文件是==保存数据的地方==，比如大家经常使用的word文档，txt文件，excel文件等都是文件。它既可以保存一张图片，也可以保持视频、声音...
+文件，对我们来说并不陌生，文件是==保存数据的地方==，比如大家经常使用的word文档，txt文件，excel文件等都是文件。它既可以保存一张图片，也可以保存视频、声音...
 
 ### 文件流
 
 文件在程序中是以流的形式来操作的
 
-![image-20210731143109971](https://gitee.com/cmz2000/album/raw/master/image/image-20210731143109971.png)
+![image-20210731143109971](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210731143109971.png)
 
 流：数据在数据源（文件）和程序（内存）之间经历的路径
 
@@ -22,7 +22,7 @@
 
 创建文件对象的相关构造器和方法
 
-![image-20210731144157132](https://gitee.com/cmz2000/album/raw/master/image/image-20210731144157132.png)
+![image-20210731144157132](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210731144157132.png)
 
 相关方法
 
@@ -119,11 +119,11 @@ Java的IO流共涉及40多个类，实际上非常规则，都是从如上4个�
 
 ### InputStream
 
-![image-20210801103708953](https://gitee.com/cmz2000/album/raw/master/image/image-20210801103708953.png)
+![image-20210801103708953](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801103708953.png)
 
 #### FileInoutStream
 
-![image-20210801104524027](https://gitee.com/cmz2000/album/raw/master/image/image-20210801104524027.png)
+![image-20210801104524027](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801104524027.png)
 
 代码演示如下：
 
@@ -191,11 +191,11 @@ public void fileRead02() {
 
 ### OutputStream
 
-![image-20210801111317784](https://gitee.com/cmz2000/album/raw/master/image/image-20210801111317784.png)
+![image-20210801111317784](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801111317784.png)
 
 #### FileOutputStream
 
-![image-20210801111231437](https://gitee.com/cmz2000/album/raw/master/image/image-20210801111231437.png)
+![image-20210801111231437](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801111231437.png)
 
 在a.txt文件中写入“hello, world"，如果文件不存在，会创建文件（注意：前提是目录已经存在）
 
@@ -233,7 +233,7 @@ public void writeFile() {
 
 利用InputStream和OutputStream实现文件拷贝
 
-![image-20210801122935058](https://gitee.com/cmz2000/album/raw/master/image/image-20210801122935058.png)
+![image-20210801122935058](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801122935058.png)
 
 ```java
 public void fileCopy() {
@@ -271,7 +271,7 @@ public void fileCopy() {
 
 ### Reader
 
-![image-20210801123329766](https://gitee.com/cmz2000/album/raw/master/image/image-20210801123329766.png)
+![image-20210801123329766](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801123329766.png)
 
 #### FileReader
 
@@ -316,7 +316,7 @@ public void fileReader() {
 
 ### Writer
 
-![image-20210801123513044](https://gitee.com/cmz2000/album/raw/master/image/image-20210801123513044.png)
+![image-20210801123513044](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801123513044.png)
 
 #### FileWriter
 
@@ -367,13 +367,13 @@ public void fileWriter() {
 
 **节点流**可以从一个特定的数据源读写数据，如FiteReader、FileWriter
 
-![image-20210801144235078](https://gitee.com/cmz2000/album/raw/master/image/image-20210801144235078.png)
+![image-20210801144235078](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801144235078.png)
 
 **处理流**（也叫包装流）是“连接”在已存在的流（节点流或处理流）之上，对已存在的流（节点流或处理流）进行封装，为程序提供更为强大的读写功能，如BufferedReader、BufferedWriter
 
-![image-20210801144247616](https://gitee.com/cmz2000/album/raw/master/image/image-20210801144247616.png)
+![image-20210801144247616](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801144247616.png)
 
-![image-20210801144601846](https://gitee.com/cmz2000/album/raw/master/image/image-20210801144601846.png)
+![image-20210801144601846](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801144601846.png)
 
 节点流和处理流的区别和联系：
 
@@ -487,15 +487,15 @@ public void bufferedCopy() {
 
 BufferedInputStream是字节流，在创建BufferedInputStream时，会创建一个内部缓冲区数组。
 
-<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210801163416101.png" alt="image-20210801163416101" style="zoom:67%;" />
+<img src="https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801163416101.png" alt="image-20210801163416101" style="zoom:67%;" />
 
-![image-20210801163540937](https://gitee.com/cmz2000/album/raw/master/image/image-20210801163540937.png)
+![image-20210801163540937](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801163540937.png)
 
 #### BufferedOutputStream
 
-<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210801163705739.png" alt="image-20210801163705739" style="zoom:50%;" />
+<img src="https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801163705739.png" alt="image-20210801163705739" style="zoom:50%;" />
 
-![image-20210801163738654](https://gitee.com/cmz2000/album/raw/master/image/image-20210801163738654.png)
+![image-20210801163738654](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801163738654.png)
 
 #### Buffered字节文件拷贝
 
@@ -558,7 +558,7 @@ ObjectInputStream和ObjectOutputStream
 
 #### ObjectlnputStream
 
-![image-20210801211508469](https://gitee.com/cmz2000/album/raw/master/image/image-20210801211508469.png)
+![image-20210801211508469](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801211508469.png)
 
 代码演示序列化：
 
@@ -594,7 +594,7 @@ class Dog implements Serializable {
 
 #### ObjectOutputStream
 
-![image-20210801211552429](https://gitee.com/cmz2000/album/raw/master/image/image-20210801211552429.png)
+![image-20210801211552429](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210801211552429.png)
 
 接下来使用ObjectOutputStream把上面的d:/data.dat反序列化并输出打印，代码如下：
 
@@ -670,7 +670,7 @@ InputStreamReader 和 OutputStreamWriter
 
 #### InputStreamReader
 
-![image-20210802111304944](https://gitee.com/cmz2000/album/raw/master/image/image-20210802111304944.png)
+![image-20210802111304944](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210802111304944.png)
 
 可以看到，InputStreamReader的构造器可以传入一个InputStream并指定处理的编码格式
 
@@ -692,7 +692,7 @@ public void inputStreamReader() throws Exception {
 
 #### OutputStreamWriter
 
-![image-20210802111536932](https://gitee.com/cmz2000/album/raw/master/image/image-20210802111536932.png)
+![image-20210802111536932](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210802111536932.png)
 
 同样的，OutputStreamWriter也可以指定处理的编码格式
 
@@ -715,7 +715,7 @@ PrintStream 和 PrintWriter
 
 #### PrintStream
 
-<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210802113536833.png" alt="image-20210802113536833" style="zoom:67%;" />
+<img src="https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210802113536833.png" alt="image-20210802113536833" style="zoom:67%;" />
 
 代码演示：
 
@@ -743,7 +743,7 @@ public void printStream() throws IOException {
 
 #### PrintWriter
 
-<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210802113638891.png" alt="image-20210802113638891" style="zoom:67%;" />
+<img src="https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210802113638891.png" alt="image-20210802113638891" style="zoom:67%;" />
 
 代码演示：
 
@@ -839,4 +839,6 @@ public void properties03() throws IOException {
     properties.store(new FileWriter("src/mysql2.properties"), null);
 }
 ```
+
+
 
