@@ -2,9 +2,9 @@
 
 ## 内存结构概述
 
-![image-20210511182716904](https://gitee.com/cmz2000/album/raw/master/image/image-20210511182716904.png)
+![image-20210511182716904](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210511182716904.png)
 
-![image-20210511183415673](https://gitee.com/cmz2000/album/raw/master/image/image-20210511183415673.png)
+![image-20210511183415673](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210511183415673.png)
 
 ## 类加载器子系统作用
 
@@ -14,13 +14,13 @@ ClassLoader只负责class文件的加载，至于它是否可以运行，则由E
 
 加载的类信息存放于一块称为方法区的内存空间。除了类的信息外，方法区中还会存放运行时常量池信息，可能还包括字符串字面量和数字常量（这部分常量信息是Class文件中常量池部分的内存映射）
 
-![image-20210511183830883](https://gitee.com/cmz2000/album/raw/master/image/image-20210511183830883.png)
+![image-20210511183830883](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210511183830883.png)
 
 1. class file存在于本地硬盘上，可以理解为设计师画在纸上的模板，而最终这个模板在执行的时候是要加载到 JVM 当中来根据这个文件实例化出n个一模一样的实例。
 2. class file加载到 JVM 中，被称为DNA元数据模板，放在方法区。
 3. 在.class文件->JVM->最终成为元数据模板，此过程就要一个运输工具（类装载器Class Loader），扮演一个快递员的角色。
 
-![image-20210511184939527](https://gitee.com/cmz2000/album/raw/master/image/image-20210511184939527.png)
+![image-20210511184939527](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210511184939527.png)
 
 ## 类的加载过程
 
@@ -36,11 +36,11 @@ public class HelloLoader {
 
 它的加载过程如下：
 
-![image-20210511185213785](https://gitee.com/cmz2000/album/raw/master/image/image-20210511185213785.png)
+![image-20210511185213785](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210511185213785.png)
 
 完整的流程图如下所示：
 
-![image-20210511185152939](https://gitee.com/cmz2000/album/raw/master/image/image-20210511185152939.png)
+![image-20210511185152939](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210511185152939.png)
 
 ### 加载阶段 Loading
 
@@ -48,7 +48,7 @@ public class HelloLoader {
 
 1. 通过一个类的全限定名获取定义此类的二进制字节流
 2. 将这个字节流所代表的静态存储结构转化为**方法区**的运行时数据结构
-3. **在内存中生成一个代表这个类的java.lang.Class对象**，作为方法区这个类的各种数据的访问入口
+3. **在堆内存中生成一个代表这个类的java.lang.Class对象**，作为方法区这个类的各种数据的访问入口
 
 #### 补充：加载.class文件的方式
 
@@ -152,7 +152,7 @@ public class ClinitClass {
 }
 ```
 
-  若在上面的代码块`static块`内加入下面两行代码，则会报如下错误：
+若在上面的代码块`static块`内加入下面两行代码，则会报如下错误：
 
 ```java
         System.out.ptintln(num);//不报错
@@ -187,7 +187,7 @@ public class ClinitTest1 {
 }
 ```
 
-  输出结果为 2，也就是说首先加载`ClinitTest1`的时候，会找到main方法，然后执行Son的初始化，但是Son继承了Father，因此需要先执行Father的初始化（将A赋值为2）。通过反编译得到Father的加载过程，首先我们看到原来的值先被赋值成1，然后又被赋值成2，最后返回。
+输出结果为 2，也就是说首先加载`ClinitTest1`的时候，会找到main方法，然后执行Son的初始化，但是Son继承了Father，因此需要先执行Father的初始化（将A赋值为2）。通过反编译得到Father的加载过程，首先我们看到原来的值先被赋值成1，然后又被赋值成2，最后返回。
 
 ```java
 iconst_1
@@ -239,6 +239,22 @@ class DeadThread {
 
   从结果可知，一个类只会被加载一次，只能够执行一次初始化，这也就是同步加锁的过程
 
+#### 什么时候会发生初始化？
+
+##### 类的主动引用(一定会发生类的初始化)
+
++ 当虚拟机启动，先初始化main方法所在的类
++ new一个类的对象
++ 调用类的静态成员(除了final常量)和静态方法
++ 使用 java.lang.reflect 包的方法对类进行反射调用
++ 当初始化一个类，如果其父类没有被初始化，则先会初始化它的父类
+
+##### 类的被动引用(不会发生类的初始化)
+
++ 当访问一个静态域时，只有真正声明这个域的类才会被初始化。如：当通过子类引用父类的静态变量，不会导致子类初始化
++ 通过数组定义类引用，不会触发此类的初始化
++ 引用常量不会触发此类的初始化（常量在链接阶段就存入调用类的常量池中了)
+
 ## 类加载器分类
 
 JVM支持两种类型的类加载器 。分别为引导类加载器（Bootstrap ClassLoader）和自定义类加载器（User-Defined ClassLoader）。
@@ -247,7 +263,7 @@ JVM支持两种类型的类加载器 。分别为引导类加载器（Bootstrap 
 
 无论类加载器的类型如何划分，在程序中我们最常见的类加载器始终只有3个，如下所示：
 
-![image-20210513104715136](https://gitee.com/cmz2000/album/raw/master/image/image-20210513104715136.png)
+![image-20210513104715136](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210513104715136.png)
 
 我们通过一个类，获取它不同的加载器：
 
@@ -365,15 +381,15 @@ file:/E:/Program%20Files/Java/jdk1.8.0_131/jre/classes
 
 ClassLoader类，它是一个抽象类，其后所有的类加载器都继承自ClassLoader（不包括启动类加载器）
 
-![image-20210513115631490](https://gitee.com/cmz2000/album/raw/master/image/image-20210513115631490.png)
+![image-20210513115631490](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210513115631490.png)
 
 sun.misc.Launcher 它是一个java虚拟机的入口应用
 
-![image-20210513115927387](https://gitee.com/cmz2000/album/raw/master/image/image-20210513115927387.png)
+![image-20210513115927387](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210513115927387.png)
 
 获取ClassLoader的途径：
 
-![image-20210513120023866](https://gitee.com/cmz2000/album/raw/master/image/image-20210513120023866.png)
+![image-20210513120023866](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210513120023866.png)
 
 ## 双亲委派机制
 
@@ -387,7 +403,7 @@ Java虚拟机对class文件采用的是**按需加载**的方式，也就是说�
 
 + 如果父类加载器可以完成类加载任务，就成功返回，倘若父类加载器无法完成此加载任务，子加载器才会尝试自己去加载，这就是双亲委派模式。
 
-![image-20210513201613569](https://gitee.com/cmz2000/album/raw/master/image/image-20210513201613569.png)
+![image-20210513201613569](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210513201613569.png)
 
 ### 双亲委派机制举例
 
@@ -485,11 +501,11 @@ Java程序对类的使用方式分为：主动使用和被动使用。 主动使
 
 ## 概述
 
-![image-20210514095857907](https://gitee.com/cmz2000/album/raw/master/image/image-20210514095857907.png)
+![image-20210514095857907](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210514095857907.png)
 
 当我们通过前面的：类的加载 --> 验证 --> 准备 --> 解析 --> 初始化 这几个阶段完成后，就会用到执行引擎对我们的类进行使用，同时执行引擎会使用到运行时数据区。
 
-![image-20210514100222547](https://gitee.com/cmz2000/album/raw/master/image/image-20210514100222547.png)
+![image-20210514100222547](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210514100222547.png)
 
 内存是非常重要的系统资源，是硬盘和CPU的中间仓库及桥梁，承载着操作系统和应用程序的实时运行JVM内存布局规定了Java在运行过程中内存申请、分配、管理的策略，保证了JVM的高效稳定运行。不同的JVM对于内存的划分方式和管理机制存在着部分差异。
 
@@ -497,7 +513,7 @@ Java程序对类的使用方式分为：主动使用和被动使用。 主动使
 
 **运行时数据区完整图：**
 
-![image-20200705112416101](https://gitee.com/cmz2000/album/raw/master/image/image-20200705112416101.png)
+![image-20200705112416101](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705112416101.png)
 
 Java虚拟机定义了若干种程序运行期间会使用到的运行时数据区，其中有一些会随着虚拟机启动而创建，随着虚拟机退出而销毁。另外一些则是与线程一一对应的，这些与线程对应的数据区域会随着线程开始和结束而创建和销毁。
 
@@ -506,7 +522,7 @@ Java虚拟机定义了若干种程序运行期间会使用到的运行时数据�
 - 每个线程：独立包括程序计数器、栈、本地栈。
 - 线程间共享：堆、堆外内存（永久代或元空间、代码缓存）
 
-![image-20200705112601211](https://gitee.com/cmz2000/album/raw/master/image/image-20200705112601211.png)
+![image-20200705112601211](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705112601211.png)
 
 ## 线程
 
@@ -533,7 +549,7 @@ Java虚拟机定义了若干种程序运行期间会使用到的运行时数据�
 
 JVM中的程序计数寄存器（Program Counter Register）中，Register的命名源于CPU的寄存器，寄存器存储指令相关的现场信息。CPU只有把数据装载到寄存器才能够运行。这里，并非是广义上所指的物理寄存器，或许将其翻译为PC计数器（或指令计数器）会更加贴切（也称为程序钩子），并且也不容易引起一些不必要的误会。JVM中的PC寄存器是对物理PC寄存器的一种抽象模拟。
 
-![image-20200705155551919](https://gitee.com/cmz2000/album/raw/master/image/image-20200705155551919.png)
+![image-20200705155551919](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705155551919.png)
 
 它是一块很小的内存空间，几乎可以忽略不记。也是运行速度最快的存储区域。
 
@@ -550,7 +566,7 @@ JVM中的程序计数寄存器（Program Counter Register）中，Register的命
 1. 字节码解释器通过改变程序计数器来依次读取指令，从而实现代码的流程控制，如：顺序执行、选择、循环、异常处理。
 2. 在多线程的情况下，程序计数器用于记录当前线程执行的位置，从而当线程被切换回来的时候能够知道该线程上次运行到哪儿了。
 
-![image-20200705155728557](https://gitee.com/cmz2000/album/raw/master/image/image-20200705155728557.png)
+![image-20200705155728557](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705155728557.png)
 
 PC寄存器用来存储指向下一条指令的地址，也即将要执行的指令代码。由执行引擎读取下一条指令。
 
@@ -584,7 +600,7 @@ public class PCRegisterTest {
 
 通过PC寄存器，我们就可以知道当前程序执行到哪一步了
 
-![image-20200705161007423](https://gitee.com/cmz2000/album/raw/master/image/image-20200705161007423.png)
+![image-20200705161007423](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705161007423.png)
 
 ### Q & A
 
@@ -613,7 +629,7 @@ public class PCRegisterTest {
 - **栈解决程序的运行问题**，即程序如何执行，或者说如何处理数据。
 - **堆解决的是数据存储的问题**，即数据怎么放，放哪里
 
-![image-20210514111446630](https://gitee.com/cmz2000/album/raw/master/image/image-20210514111446630.png)
+![image-20210514111446630](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210514111446630.png)
 
 ####  Java虚拟机栈是什么
 
@@ -621,7 +637,7 @@ Java虚拟机栈（Java Virtual Machine Stack），早期也叫Java栈。每个�
 
 > 是线程私有的
 
-![image-20200705164722033](https://gitee.com/cmz2000/album/raw/master/image/image-20200705164722033.png)
+![image-20200705164722033](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705164722033.png)
 
 ####  生命周期
 
@@ -646,7 +662,7 @@ JVM直接对Java栈的操作只有两个：
 
 对于栈来说不存在垃圾回收问题（栈存在溢出的情况）
 
-![image-20200705165025382](https://gitee.com/cmz2000/album/raw/master/image/image-20200705165025382.png)
+![image-20200705165025382](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705165025382.png)
 
 ####  开发中遇到哪些异常？
 
@@ -695,7 +711,7 @@ public class StackErrorTest {
 + 执行引擎运行的所有字节码指令只针对当前栈帧进行操作。
 + 如果在该方法中调用了其他方法，对应的新的栈帧会被创建出来，放在栈的顶端，成为新的当前帧。
 
-![image-20200705203142545](https://gitee.com/cmz2000/album/raw/master/image/image-20200705203142545.png)
+![image-20200705203142545](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705203142545.png)
 
 通过下面简单的代码演示：
 
@@ -752,11 +768,11 @@ public class StackFrameTest {
 - 方法返回地址（Return Address）（或方法正常退出或者异常退出的定义）
 - 一些附加信息
 
-![image-20200705204836977](https://gitee.com/cmz2000/album/raw/master/image/image-20200705204836977.png)
+![image-20200705204836977](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705204836977.png)
 
 每个并行线程下的栈都是私有的，因此每个线程都有自己各自的栈，并且每个栈里面都有很多栈帧，栈帧的大小主要由局部变量表 和 操作数栈决定的
 
-![image-20200705205443993](https://gitee.com/cmz2000/album/raw/master/image/image-20200705205443993.png)
+![image-20200705205443993](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705205443993.png)
 
 ### 局部变量表
 
@@ -794,7 +810,7 @@ public class StackFrameTest {
 
 + 如果当前帧是由构造方法或者实例方法创建的，那么**该对象引用 this 将会存放在 index 为 0 的 slot 处**，其余的参数按照参数表顺序继续排列。
 
-![image-20200705212454445](https://gitee.com/cmz2000/album/raw/master/image/image-20200705212454445.png)
+![image-20200705212454445](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200705212454445.png)
 
 #### slot的重复利用
 
@@ -855,9 +871,9 @@ public void test() {
   + 某些字节码指令将值压入操作数栈，其余的字节码指令将操作数取出栈。使用它们后再把结果压入栈。
   + 比如：执行复制、交换、求和等操作
 
-![image-20200706090618332](https://gitee.com/cmz2000/album/raw/master/image/image-20200706090618332.png)
+![image-20200706090618332](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706090618332.png)
 
-![image-20200706090833697](https://gitee.com/cmz2000/album/raw/master/image/image-20200706090833697.png)
+![image-20200706090833697](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706090833697.png)
 
 + 操作数栈，主要用于保存计算过程的中间结果，同时作为计算过程中变量临时的存储空间。
 
@@ -894,7 +910,7 @@ public void testAddOperation() {
 
 使用javap 命令反编译class文件： javap -v 类名.class
 
-![image-20200706092610730](https://gitee.com/cmz2000/album/raw/master/image/image-20200706092610730.png)
+![image-20200706092610730](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706092610730.png)
 
 > byte、short、char、boolean 内部都是使用int型来进行保存的
 >
@@ -912,11 +928,11 @@ public void testAddOperation() {
 >
 > 再不行则考虑int型
 
-![image-20200706093131621](https://gitee.com/cmz2000/album/raw/master/image/image-20200706093131621.png)
+![image-20200706093131621](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706093131621.png)
 
 执行完后，让PC + 1，指向下一行代码，下一行代码就是使用`istore`将操作数栈的元素存储到局部变量表1的位置，我们可以看到局部变量表的已经增加了一个元素。
 
-![image-20200706093251302](https://gitee.com/cmz2000/album/raw/master/image/image-20200706093251302.png)
+![image-20200706093251302](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706093251302.png)
 
 > 为什么局部变量表不是从0开始的呢？
 >
@@ -924,21 +940,21 @@ public void testAddOperation() {
 
 然后PC+1，指向的是下一行。使用`bitpush`让操作数8也入栈，同时执行`istore`操作，存入局部变量表中
 
-![image-20200706093646406](https://gitee.com/cmz2000/album/raw/master/image/image-20200706093646406.png)
+![image-20200706093646406](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706093646406.png)
 
-![image-20200706093751711](https://gitee.com/cmz2000/album/raw/master/image/image-20200706093751711.png)
+![image-20200706093751711](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706093751711.png)
 
 然后从局部变量表中，使用`iload`依次将数据加载到操作数栈中
 
-![image-20200706093859191](https://gitee.com/cmz2000/album/raw/master/image/image-20200706093859191.png)
+![image-20200706093859191](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706093859191.png)
 
-![image-20200706093921573](https://gitee.com/cmz2000/album/raw/master/image/image-20200706093921573.png)
+![image-20200706093921573](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706093921573.png)
 
 然后将操作数栈中的两个元素执行相加操作（结果存放在栈顶），并使用`istore`存储到局部变量表3的位置
 
-![image-20200706094046782](https://gitee.com/cmz2000/album/raw/master/image/image-20200706094046782.png)
+![image-20200706094046782](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706094046782.png)
 
-![image-20200706094109629](https://gitee.com/cmz2000/album/raw/master/image/image-20200706094109629.png)
+![image-20200706094109629](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706094109629.png)
 
 最后PC寄存器的位置指向10，也就是return方法，没有返回值则直接退出方法。
 
@@ -948,7 +964,7 @@ public void testAddOperation() {
 
 **A：**考虑下面四种情况，对应字节码分析
 
-![image-20210517111926777](https://gitee.com/cmz2000/album/raw/master/image/image-20210517111926777.png)
+![image-20210517111926777](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210517111926777.png)
 
 完整字节码如下：
 
@@ -1014,7 +1030,7 @@ i9:22
 
 动态链接：Dynamic Linking（或指向运行时常量池的方法引用）
 
-![image-20200706100311886](https://gitee.com/cmz2000/album/raw/master/image/image-20200706100311886.png)
+![image-20200706100311886](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706100311886.png)
 
 > 动态链接、方法返回地址、附加信息：（这三者）有些地方被称为帧数据区
 
@@ -1022,7 +1038,7 @@ i9:22
 
 在Java源文件被编译到字节码文件中时，所有的变量和方法引用都作为符号引用（symbolic Reference）保存在class文件的常量池里。比如：描述一个方法调用了另外的其他方法时，就是通过常量池中指向方法的符号引用来表示的，那么**动态链接的作用就是为了将这些符号引用转换为调用方法的直接引用**。
 
-![image-20200706101251847](https://gitee.com/cmz2000/album/raw/master/image/image-20200706101251847.png)
+![image-20200706101251847](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706101251847.png)
 
 > 为什么需要运行时常量池？
 >
@@ -1172,7 +1188,7 @@ Java7中增加的动态语言类型支持的本质是对Java虚拟机规范的�
 + 每个类中都有一个虚方法表，表中存放着各个方法的实际入口。
 + 虚方法表是什么时候被创建的呢？虚方法表会在类加载的链接阶段被创建并开始初始化，类的变量初始值准备完成之后，JVM会把该类的方法表也初始化完毕。
 
-![image-20200706144954070](https://gitee.com/cmz2000/album/raw/master/image/image-20200706144954070.png)
+![image-20200706144954070](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706144954070.png)
 
 如上图所示：如果类中重写了方法，那么调用的时候，就会直接在虚方法表中查找，否则将会直接连接到Object的方法中。
 
@@ -1195,7 +1211,7 @@ Java7中增加的动态语言类型支持的本质是对Java虚拟机规范的�
 
 方法执行过程中，抛出异常时的异常处理，存储在一个异常处理表，方便在发生异常的时候找到处理异常的代码。
 
-![image-20200706154554604](https://gitee.com/cmz2000/album/raw/master/image/image-20200706154554604.png)
+![image-20200706154554604](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706154554604.png)
 
 本质上，方法的退出就是当前栈帧出栈的过程。此时，需要恢复上层方法的局部变量表、操作数栈、将返回值压入调用者栈帧的操作数栈、设置PC寄存器值等，让调用者方法继续执行下去。
 
@@ -1301,7 +1317,7 @@ public class StringBuilderTest {
 
 它的具体做法是Native Method Stack中登记native方法，在 Execution Engine 执行时加载本地方法库。
 
-![image-20210716200754481](https://gitee.com/cmz2000/album/raw/master/image/image-20210716200754481.png)
+![image-20210716200754481](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210716200754481.png)
 
 当某个线程调用一个本地方法时，它就进入了一个全新的并且不再受虚拟机限制的世界。它和虚拟机拥有同样的权限。
 
@@ -1319,7 +1335,7 @@ public class StringBuilderTest {
 
 堆针对一个JVM进程来说是唯一的，也就是一个进程只有一个JVM，但是进程包含多个线程，他们是共享同一堆空间的。
 
-![image-20210716203151260](https://gitee.com/cmz2000/album/raw/master/image/image-20210716203151260.png)
+![image-20210716203151260](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210716203151260.png)
 
 一个JVM实例只存在一个堆内存，堆也是Java内存管理的核心区域。
 
@@ -1337,7 +1353,7 @@ Java堆区在JVM启动的时候即被创建，其空间大小也就确定了。�
 
 下图就是使用：Java VisualVM查看堆空间的内容，通过 jdk\bin 提供的插件
 
-![image-20210716204043693](https://gitee.com/cmz2000/album/raw/master/image/image-20210716204043693.png)
+![image-20210716204043693](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210716204043693.png)
 
 《Java虚拟机规范》中对Java堆的描述是：所有的对象实例以及数组都应当在运行时分配在堆上。（The heap is the run-time data area from which memory for all class instances and arrays is allocated）
 
@@ -1363,7 +1379,7 @@ public class SimpleHeap {
 }
 ```
 
-![image-20210717092549425](https://gitee.com/cmz2000/album/raw/master/image/image-20210717092549425.png)
+![image-20210717092549425](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717092549425.png)
 
 #### 堆内存细分
 
@@ -1383,11 +1399,11 @@ JDK 8及之后堆内存**逻辑上**分为三部分：新生区+养老区+元空
 
 JDK 7堆空间内部结构如下
 
-![image-20210717094323939](https://gitee.com/cmz2000/album/raw/master/image/image-20210717094323939.png)
+![image-20210717094323939](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717094323939.png)
 
 堆空间包括新生代和老年代，而永久代属于方法区
 
-![image-20210717095734035](https://gitee.com/cmz2000/album/raw/master/image/image-20210717095734035.png)
+![image-20210717095734035](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717095734035.png)
 
 ### 设置堆内存大小与OOM
 
@@ -1439,19 +1455,19 @@ public class HeapSpaceInitial {
 >
 > 2.使用命令 `jstat -gc 进程id` 查看堆内存的分配情况
 
-![image-20210717102839733](https://gitee.com/cmz2000/album/raw/master/image/image-20210717102839733.png)
+![image-20210717102839733](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717102839733.png)
 
 + 方式二
 
 > 使用VM参数 `-XX:+PrintGCDetails`
 
-![image-20210717102925372](https://gitee.com/cmz2000/album/raw/master/image/image-20210717102925372.png)
+![image-20210717102925372](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717102925372.png)
 
 #### OOM举例
 
-![image-20210717104250168](https://gitee.com/cmz2000/album/raw/master/image/image-20210717104250168.png)
+![image-20210717104250168](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717104250168.png)
 
-![image-20210717104327316](https://gitee.com/cmz2000/album/raw/master/image/image-20210717104327316.png)
+![image-20210717104327316](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717104327316.png)
 
 写一个简单的OOM例子
 
@@ -1474,7 +1490,7 @@ public class OOMTest {
 
 运行后，就出现OOM了，那么我们可以通过 jvisualvm 这个工具查看具体是什么参数造成的OOM
 
-![image-20210717105405907](https://gitee.com/cmz2000/album/raw/master/image/image-20210717105405907.png)
+![image-20210717105405907](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717105405907.png)
 
 ### 年轻代与老年代
 
@@ -1487,11 +1503,11 @@ Java堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 
 其中年轻代又可以划分为Eden空间、Survivor0空间和Survivor1空间（有时也叫做from区、to区）
 
-![image-20210717110544550](https://gitee.com/cmz2000/album/raw/master/image/image-20210717110544550.png)
+![image-20210717110544550](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717110544550.png)
 
 下面这参数开发中一般不会调：
 
-![image-20210717110651072](https://gitee.com/cmz2000/album/raw/master/image/image-20210717110651072.png)
+![image-20210717110651072](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717110651072.png)
 
 - Eden : From : to -> 8 : 1 : 1
 - 新生代 : 老年代 - > 1 : 2
@@ -1513,7 +1529,7 @@ Java堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 
 > 这个参数一般使用默认值就可以了。
 
-![image-20210717112044906](https://gitee.com/cmz2000/album/raw/master/image/image-20210717112044906.png)
+![image-20210717112044906](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717112044906.png)
 
 生命周期超过15的，将进入老年代。
 
@@ -1537,7 +1553,7 @@ Java堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 
 我们创建的对象，一般都是存放在Eden区的，当Eden区满了后，就会触发GC操作，一般被称为 YGC / Minor GC 操作
 
-![image-20210717161911738](https://gitee.com/cmz2000/album/raw/master/image/image-20210717161911738.png)
+![image-20210717161911738](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717161911738.png)
 
 当我们进行一次垃圾收集后，红色的将会被回收，而绿色的还会被占用着，存放在 Survivor0 / From 区。同时我们给每个对象设置了一个年龄计数器，一次回收后就是1。
 
@@ -1545,11 +1561,11 @@ Java堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 
 （两个Survivor区也分别叫做from区和to区，但具体不确定哪个是from，哪个是to，根据当前哪个Survivor是空的而随时变化，即：谁空谁是to，往to放东西）
 
-![image-20210717162239698](https://gitee.com/cmz2000/album/raw/master/image/image-20210717162239698.png)
+![image-20210717162239698](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717162239698.png)
 
 我们继续不断的进行对象生成和垃圾回收，当 Survivor 中的对象的年龄达到 15 的时候，将会触发一次 Promotion 晋升的操作，也就是将年轻代中的对象晋升到老年代中
 
-![image-20210717162827175](https://gitee.com/cmz2000/album/raw/master/image/image-20210717162827175.png)
+![image-20210717162827175](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717162827175.png)
 
 #### 思考：幸存者区满了后？
 
@@ -1564,7 +1580,7 @@ Java堆区进一步细分的话，可以划分为年轻代（YoungGen）和老�
 
 #### 对象分配的特殊情况
 
-![image-20210717165731397](https://gitee.com/cmz2000/album/raw/master/image/image-20210717165731397.png)
+![image-20210717165731397](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717165731397.png)
 
 在 Eden 区进行 Minor GC 后，Eden 区一定是空的，如果这时 Eden 区还放不下新对象，则说明是超大对象，直接放到老年区。
 
@@ -1603,7 +1619,7 @@ jvisualvm
 
 然后执行上面代码，通过 VisualGC 进行动态化查看
 
-![GC](https://gitee.com/cmz2000/album/raw/master/image/GC.gif)
+![GC](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/GC.gif)
 
 最终，在老年代和新生代都满了之后，就出现OOM
 
@@ -1655,7 +1671,7 @@ Minor GC会引发STW，暂停其它用户的线程，等垃圾回收结束，用
 
 > STW : stop-the-world
 
-![image-20210717195707771](https://gitee.com/cmz2000/album/raw/master/image/image-20210717195707771.png)
+![image-20210717195707771](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717195707771.png)
 
 #### Major GC
 
@@ -1689,11 +1705,11 @@ Major GC的速度一般会比Minor GC慢10倍以上，STW的时间更长，如�
 >
 > 老年代：存放新生代中经历多次GC仍然存活的对象。
 
-![image-20210717201616904](https://gitee.com/cmz2000/album/raw/master/image/image-20210717201616904.png)
+![image-20210717201616904](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717201616904.png)
 
 其实不分代完全可以，分代的唯一理由就是**优化GC性能**。如果没有分代，那所有的对象都在一块，就如同把一个学校的人都关在一个教室。GC的时候要找到哪些对象没用，这样就会对堆的所有区域进行扫描。而很多对象都是朝生夕死的，如果分代的话，把新创建的对象放到某一地方，当GC的时候先把这块存储“朝生夕死”对象的区域进行回收，这样就会腾出很大的空间出来。
 
-![image-20210717201715957](https://gitee.com/cmz2000/album/raw/master/image/image-20210717201715957.png)
+![image-20210717201715957](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717201715957.png)
 
 ### 内存分配策略
 
@@ -1739,7 +1755,7 @@ TLAB：Thread Local Allocation Buffer，也就是为每个线程单独分配了�
 
 所有OpenJDK衍生出来的JVM都提供了TLAB的设计。
 
-![image-20210717210107635](https://gitee.com/cmz2000/album/raw/master/image/image-20210717210107635.png)
+![image-20210717210107635](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717210107635.png)
 
 尽管不是所有的对象实例都能够在TLAB中成功分配内存，但**JVM确实是将TLAB作为内存分配的首选**。
 
@@ -1753,7 +1769,7 @@ TLAB：Thread Local Allocation Buffer，也就是为每个线程单独分配了�
 
 对象首先是通过TLAB开辟空间，如果不能放入，那么需要通过Eden来进行分配
 
-![image-20210717210806014](https://gitee.com/cmz2000/album/raw/master/image/image-20210717210806014.png)
+![image-20210717210806014](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210717210806014.png)
 
 ### 小结堆空间的参数设置
 
@@ -1996,15 +2012,15 @@ private static void alloc() {
 
 ## 方法区
 
-![image-20210719093657747](https://gitee.com/cmz2000/album/raw/master/image/image-20210719093657747.png)
+![image-20210719093657747](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210719093657747.png)
 
-![image-20210719093754811](https://gitee.com/cmz2000/album/raw/master/image/image-20210719093754811.png)
+![image-20210719093754811](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210719093754811.png)
 
 ThreadLocal：如何保证多个线程在并发环境下的安全性？典型应用就是数据库连接管理，以及会话管理
 
 ### 栈、堆、方法区的交互方式
 
-![image-20210719094118351](https://gitee.com/cmz2000/album/raw/master/image/image-20210719094118351.png)
+![image-20210719094118351](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210719094118351.png)
 
 + Person：存放在元空间，也可以说方法区
 + person：存放在Java栈的局部变量表中
@@ -2016,7 +2032,7 @@ ThreadLocal：如何保证多个线程在并发环境下的安全性？典型应
 
 所以，方法区看作是一块独立于Java堆的内存空间。
 
-![image-20210719100602098](https://gitee.com/cmz2000/album/raw/master/image/image-20210719100602098.png)
+![image-20210719100602098](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210719100602098.png)
 
 方法区主要存放的是类，而堆中主要存放的是实例化的对象
 
@@ -2039,11 +2055,11 @@ ThreadLocal：如何保证多个线程在并发环境下的安全性？典型应
 
 > 现在来看，当年使用永久代，不是好的idea。导致Java程序更容易OOM（超过 -XX:MaxPermsize上限）
 
-![image-20210719101857188](https://gitee.com/cmz2000/album/raw/master/image/image-20210719101857188.png)
+![image-20210719101857188](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210719101857188.png)
 
 而到了JDK8，终于完全废弃了永久代的概念，改用与JRockit、J9一样在本地内存中实现的元空间（Metaspace）来代替
 
-![image-20210719102022308](https://gitee.com/cmz2000/album/raw/master/image/image-20210719102022308.png)
+![image-20210719102022308](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210719102022308.png)
 
 元空间的本质和永久代类似，都是对JVM规范中方法区的实现。不过元空间与永久代最大的区别在于：**元空间不在虚拟机设置的内存中，而是使用本地内存。**
 
@@ -2061,7 +2077,7 @@ ThreadLocal：如何保证多个线程在并发环境下的安全性？典型应
 + -XX:MaxPermSize来设定永久代最大可分配空间。32位机器默认是64M，64位机器默认是82M。
 + 当JVM加载的类信息容量超过了这个值，会报异常OutOfMemoryError:PermGen space。
 
-![image-20210719102318554](https://gitee.com/cmz2000/album/raw/master/image/image-20210719102318554.png)
+![image-20210719102318554](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210719102318554.png)
 
 #### JDK 8及以后：
 
@@ -2084,11 +2100,11 @@ ThreadLocal：如何保证多个线程在并发环境下的安全性？典型应
 
 ### 方法区的内部结构
 
-![image-20210719112036196](https://gitee.com/cmz2000/album/raw/master/image/image-20210719112036196.png)
+![image-20210719112036196](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210719112036196.png)
 
 《深入理解Java虚拟机》书中对方法区（Method Area）存储内容描述如下：它用于存储已被虚拟机加载的类型信息、常量、静态变量、即时编译器编译后的代码缓存等。
 
-![image-20210719112306690](https://gitee.com/cmz2000/album/raw/master/image/image-20210719112306690.png)
+![image-20210719112306690](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210719112306690.png)
 
 #### 类型信息
 
@@ -2150,7 +2166,7 @@ class Order {
 
 #### 运行时常量池 vs 常量池
 
-![image-20210720111040595](https://gitee.com/cmz2000/album/raw/master/image/image-20210720111040595.png)
+![image-20210720111040595](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720111040595.png)
 
 - 方法区，内部包含了运行时常量池
 - 字节码文件，内部包含了常量池
@@ -2159,7 +2175,7 @@ class Order {
 
 #### 常量池
 
-![image-20210720112117047](https://gitee.com/cmz2000/album/raw/master/image/image-20210720112117047.png)
+![image-20210720112117047](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720112117047.png)
 
 一个有效的字节码文件中除了包含类的版本信息、字段、方法以及接口等描述符信息外，还包含一项信息就是常量池表（Constant Pool Table），包括各种字面量和对类型、域和方法的符号引用。
 
@@ -2177,7 +2193,7 @@ public class SimpleClass {
 }
 ```
 
-![image-20210720112502986](https://gitee.com/cmz2000/album/raw/master/image/image-20210720112502986.png)
+![image-20210720112502986](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720112502986.png)
 
 虽然上述代码只有194字节，但是里面却使用了String、System、PrintStream及Object等结构。这里的代码量其实很少了，如果代码多的话，引用的结构将会更多，这里就需要用到常量池了。
 
@@ -2231,35 +2247,35 @@ public class MethodAreaDemo {
 
 字节码执行过程为
 
-![image-20210720134829315](https://gitee.com/cmz2000/album/raw/master/image/image-20210720134829315.png)
+![image-20210720134829315](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720134829315.png)
 
 首先现将操作数500放入到操作数栈中
 
-![image-20210720135303728](https://gitee.com/cmz2000/album/raw/master/image/image-20210720135303728.png)
+![image-20210720135303728](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720135303728.png)
 
 然后存储到局部变量表中
 
-![image-20210720135355169](https://gitee.com/cmz2000/album/raw/master/image/image-20210720135355169.png)
+![image-20210720135355169](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720135355169.png)
 
 然后重复一次，把100放入局部变量表中，最后再将变量表中的 500 和 100 取出，进行操作
 
-![image-20210720135505170](https://gitee.com/cmz2000/album/raw/master/image/image-20210720135505170.png)
+![image-20210720135505170](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720135505170.png)
 
 将 500 和 100 进行一个除法运算，在把结果入栈
 
-![image-20210720135540377](https://gitee.com/cmz2000/album/raw/master/image/image-20210720135540377.png)
+![image-20210720135540377](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720135540377.png)
 
 再之后就是输出流，需要调用运行时常量池的常量
 
-![image-20210720135627169](https://gitee.com/cmz2000/album/raw/master/image/image-20210720135627169.png)
+![image-20210720135627169](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720135627169.png)
 
 最后调用 invokevirtual（虚方法调用），然后返回
 
-![image-20210720135704160](https://gitee.com/cmz2000/album/raw/master/image/image-20210720135704160.png)
+![image-20210720135704160](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720135704160.png)
 
 返回时
 
-![image-20210720135743592](https://gitee.com/cmz2000/album/raw/master/image/image-20210720135743592.png)
+![image-20210720135743592](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210720135743592.png)
 
 程序计数器始终计算的都是当前代码运行的位置，目的是为了方便记录方法调用后能够正常返回，或者是进行了CPU切换后，也能回来到原来的代码进行执行。
 
@@ -2274,15 +2290,15 @@ Hotspot中方法区的变化：
 | JDK1.7       | 有永久代，但已经逐步 “去永久代”，字符串常量池，静态变量移除，保存在堆中 |
 | JDK1.8       | 无永久代，类型信息，字段，方法，常量保存在本地内存的元空间，但字符串常量池、静态变量仍然在堆中。 |
 
-![image-20210722101732789](https://gitee.com/cmz2000/album/raw/master/image/image-20210722101732789.png)
+![image-20210722101732789](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722101732789.png)
 
 JDK 7的时候，还是使用虚拟机内存
 
-![image-20210722101803802](https://gitee.com/cmz2000/album/raw/master/image/image-20210722101803802.png)
+![image-20210722101803802](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722101803802.png)
 
 JDK 8的时候，元空间就只受本地内存影响了
 
-![image-20210722101836230](https://gitee.com/cmz2000/album/raw/master/image/image-20210722101836230.png)
+![image-20210722101836230](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722101836230.png)
 
 #### 为什么永久代要被元空间替换
 
@@ -2335,7 +2351,7 @@ staticObj 随着Test的类型信息存放在方法区，instanceObj 随着Test�
 
 从《Java虚拟机规范》所定义的概念模型来看，所有Class相关的信息都应该存放在方法区之中，但方法区该如何实现，《Java虚拟机规范》并未做出规定，这就成了一件允许不同虚拟机自己灵活把握的事情。JDK 7及其以后版本的HotSpot虚拟机选择把静态变量与类型在Java语言一端的映射class对象存放在一起，存储于Java堆之中，从我们的实验中也明确验证了这一点。
 
-![image-20210722105008230](https://gitee.com/cmz2000/album/raw/master/image/image-20210722105008230.png)
+![image-20210722105008230](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722105008230.png)
 
 测试发现：三个对象的数据在内存中的地址都落在Eden区范围内，所以结论：**只要是对象实例必然会在Java堆中分配**。
 
@@ -2369,7 +2385,7 @@ Java虚拟机被允许对满足上述三个条件的无用类进行回收，这�
 
 ### 小结
 
-![image-20210722114213519](https://gitee.com/cmz2000/album/raw/master/image/image-20210722114213519.png)
+![image-20210722114213519](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722114213519.png)
 
 ## 对象的实例化内存布局与访问定位
 
@@ -2383,7 +2399,7 @@ Java虚拟机被允许对满足上述三个条件的无用类进行回收，这�
 
 从对象创建的方式和步骤开始说：
 
-![image-20210722114909979](https://gitee.com/cmz2000/album/raw/master/image/image-20210722114909979.png)
+![image-20210722114909979](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722114909979.png)
 
 #### 创建对象的方式
 
@@ -2454,7 +2470,7 @@ Java虚拟机被允许对满足上述三个条件的无用类进行回收，这�
 
 ### 对象的内存布局
 
-![image-20210722170524545](https://gitee.com/cmz2000/album/raw/master/image/image-20210722170524545.png)
+![image-20210722170524545](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722170524545.png)
 
 结合代码来分析：
 
@@ -2479,23 +2495,23 @@ class Account {
 }
 ```
 
-![image-20210722171318872](https://gitee.com/cmz2000/album/raw/master/image/image-20210722171318872.png)
+![image-20210722171318872](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722171318872.png)
 
 ### 对象的访问定位
 
-![image-20210722172731958](https://gitee.com/cmz2000/album/raw/master/image/image-20210722172731958.png)
+![image-20210722172731958](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722172731958.png)
 
 #### 图示
 
 JVM是如何通过栈帧中的对象引用访问到其内部的对象实例呢？
 
-![image-20210722172839064](https://gitee.com/cmz2000/album/raw/master/image/image-20210722172839064.png)
+![image-20210722172839064](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722172839064.png)
 
 #### 对象访问的两种方式
 
 ##### 句柄访问
 
-![image-20210722173040794](https://gitee.com/cmz2000/album/raw/master/image/image-20210722173040794.png)
+![image-20210722173040794](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722173040794.png)
 
 句柄访问就是在栈的局部变量表中，记录的对象的引用，然后在堆空间中开辟了一块空间，也就是句柄池
 
@@ -2503,13 +2519,13 @@ JVM是如何通过栈帧中的对象引用访问到其内部的对象实例呢�
 
 ##### 直接指针
 
-![image-20210722173142128](https://gitee.com/cmz2000/album/raw/master/image/image-20210722173142128.png)
+![image-20210722173142128](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722173142128.png)
 
 直接指针是局部变量表中的引用，直接指向堆中的实例，在对象实例中有类型指针，指向的是方法区中的对象类型数据。Hotspot采用这种方式。
 
 # 本地方法接口
 
-![image-20200706164139252](https://gitee.com/cmz2000/album/raw/master/image/image-20200706164139252.png)
+![image-20200706164139252](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200706164139252.png)
 
 ## 什么是本地方法
 
@@ -2585,11 +2601,11 @@ ByteBuffer byteBuffer = ByteBuffer.allocateDirect(BUFFER);
 
 传统采用BIO的架构，需要从用户态切换成内核态
 
-![image-20210722223913188](https://gitee.com/cmz2000/album/raw/master/image/image-20210722223913188.png)
+![image-20210722223913188](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722223913188.png)
 
 NIO的方式使用了缓存区的概念
 
-![image-20210722224046846](https://gitee.com/cmz2000/album/raw/master/image/image-20210722224046846.png)
+![image-20210722224046846](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722224046846.png)
 
 ## 存在的问题
 
@@ -2606,7 +2622,7 @@ NIO的方式使用了缓存区的概念
 
 如果不指定，默认与堆的最大值Xmx参数值一致
 
-![image-20210722230756086](https://gitee.com/cmz2000/album/raw/master/image/image-20210722230756086.png)
+![image-20210722230756086](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722230756086.png)
 
 # 执行引擎
 
@@ -2614,7 +2630,7 @@ NIO的方式使用了缓存区的概念
 
 执行引擎属于JVM的下层，里面包括解释器、即时编译器、垃圾回收器。
 
-![image-20210723095130440](https://gitee.com/cmz2000/album/raw/master/image/image-20210723095130440.png)
+![image-20210723095130440](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210723095130440.png)
 
 执行引擎是Java虚拟机核心的组成部分之一。
 
@@ -2624,7 +2640,7 @@ JVM的主要任务是负责**装载字节码到其内部**，但字节码并不�
 
 那么，如果想要让一个Java程序运行起来，执行引擎（Execution Engine）的任务就是将字节码指令解释/编译为对应平台上的本地机器指令才可以。简单来说，JVM中的执行引擎充当了将高级语言翻译为机器语言的译者。
 
-![image-20210723095839263](https://gitee.com/cmz2000/album/raw/master/image/image-20210723095839263.png)
+![image-20210723095839263](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210723095839263.png)
 
 Java程序 -> 字节码文件：前端编译		JVM内使用JIT：后端编译
 
@@ -2634,7 +2650,7 @@ Java程序 -> 字节码文件：前端编译		JVM内使用JIT：后端编译
 - 每当执行完一项指令操作后，PC寄存器就会更新下一条需要被执行的指令地址。
 - 当然方法在执行的过程中，执行引擎有可能会通过存储在局部变量表中的对象引用准确定位到存储在Java堆区中的对象实例信息，以及通过对象头中的元数据指针定位到目标对象的类型信息。
 
-![image-20210723100812142](https://gitee.com/cmz2000/album/raw/master/image/image-20210723100812142.png)
+![image-20210723100812142](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210723100812142.png)
 
 从外观上来看，所有的Java虚拟机的执行引擎输入，输出都是一致的：输入的是字节码二进制流，处理过程是字节码解析执行的等效过程，输出的是执行过程。
 
@@ -2645,15 +2661,15 @@ Java程序 -> 字节码文件：前端编译		JVM内使用JIT：后端编译
 - 前面橙色部分是生成字节码文件的过程（前端编译），和JVM无关
 - 后面蓝色和绿色才是JVM需要考虑的过程，绿色是解释过程，蓝色是编译过程（后端编译）。
 
-![image-20210723101230776](https://gitee.com/cmz2000/album/raw/master/image/image-20210723101230776.png)
+![image-20210723101230776](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210723101230776.png)
 
 Java代码编译是由Java源码编译器（前端编译）来完成，流程图如下所示：
 
-![image-20210723101745415](https://gitee.com/cmz2000/album/raw/master/image/image-20210723101745415.png)
+![image-20210723101745415](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210723101745415.png)
 
 Java字节码的执行是由JVM执行引擎来完成，流程图如下所示：
 
-![image-20210723101934152](https://gitee.com/cmz2000/album/raw/master/image/image-20210723101934152.png)
+![image-20210723101934152](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210723101934152.png)
 
 **Q**：什么是解释器？（Interpreter）
 
@@ -2671,7 +2687,7 @@ Java字节码的执行是由JVM执行引擎来完成，流程图如下所示：
 
 下面用一个总的图，来说说解释器和JIT编译器
 
-![image-20210723102923538](https://gitee.com/cmz2000/album/raw/master/image/image-20210723102923538.png)
+![image-20210723102923538](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210723102923538.png)
 
 ### 字节码
 
@@ -2853,9 +2869,9 @@ Java 7中 Oracle的工程师对字符串池的逻辑做了很大的改变，即�
 
 Java8元空间，字符串常量在堆。
 
-![image-20210722101732789](https://gitee.com/cmz2000/album/raw/master/image/image-20210722101732789.png)
+![image-20210722101732789](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722101732789.png)
 
-![image-20210722101803802](https://gitee.com/cmz2000/album/raw/master/image/image-20210722101803802.png)
+![image-20210722101803802](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210722101803802.png)
 
 ### 为什么StringTable从永久代调整到堆中
 
@@ -2916,7 +2932,7 @@ public void test2() {
 
 拼接操作的底层其实使用了StringBuilder
 
-![image-20200711102231129](https://gitee.com/cmz2000/album/raw/master/image/image-20200711102231129.png)
+![image-20200711102231129](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200711102231129.png)
 
 s1 + s2的执行细节：
 
@@ -3114,7 +3130,7 @@ System.out.println(s == s2); // true
 
 而对于下半部分的代码来说，因为 s3 变量记录的地址是 new String("11")，这段代码执行完以后，字符串常量池中不存在 "11"，这是 JDK 6的关系，然后执行 s3.intern() 后，就会在字符串常量池中生成 "11"，最后 s4 用的就是字符串常量池中 "11" 的地址。
 
-![image-20210727120113999](https://gitee.com/cmz2000/album/raw/master/image/image-20210727120113999.png)
+![image-20210727120113999](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210727120113999.png)
 
 #### JDK 7/8
 
@@ -3137,7 +3153,7 @@ System.out.println(s3 == s4); // true
 >
 > 而在JDK 7中，并没有在字符串常量池中创建一个新对象，而是直接存放堆空间中已有的"11"的引用，即指向堆中的"11"，也就是 s3
 
-![image-20210727120246211](https://gitee.com/cmz2000/album/raw/master/image/image-20210727120246211.png)
+![image-20210727120246211](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210727120246211.png)
 
 #### 扩展
 
@@ -3166,9 +3182,9 @@ JDK1.7起，将这个字符串对象尝试放入串池：
 
 #### 练习
 
-![image-20200711150859709](https://gitee.com/cmz2000/album/raw/master/image/image-20200711150859709.png)
+![image-20200711150859709](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200711150859709.png)
 
-![image-20200711151326909](https://gitee.com/cmz2000/album/raw/master/image/image-20200711151326909.png)
+![image-20200711151326909](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200711151326909.png)
 
 - 在JDK 6中，在字符串常量池中创建一个字符串 “ab”
 - 在JDK 8中，在字符串常量池中没有创建 “ab”，而是将堆中的地址复制到串池中。
@@ -3189,7 +3205,7 @@ true
 
 针对下面这题，在JDK 6和7/8中表现的是一样的：
 
-![image-20200711151433277](https://gitee.com/cmz2000/album/raw/master/image/image-20200711151433277.png)
+![image-20200711151433277](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200711151433277.png)
 
 ## G1中的去重操作
 
@@ -3225,11 +3241,11 @@ true
 
 这次我们主要关注的是黄色部分，内存的分配与回收
 
-![image-20210728093623998](https://gitee.com/cmz2000/album/raw/master/image/image-20210728093623998.png)
+![image-20210728093623998](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210728093623998.png)
 
 ### 什么是垃圾
 
-![image-20210728094952038](https://gitee.com/cmz2000/album/raw/master/image/image-20210728094952038.png)
+![image-20210728094952038](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210728094952038.png)
 
 从上图我们可以很明确的知道，Java 和 C++语言的区别，就在于垃圾收集技术和内存动态分配上，C语言没有垃圾收集技术，需要我们手动的收集。
 
@@ -3342,7 +3358,7 @@ pBridge->Register(kDestroy);
 
 GC主要关注于 方法区 和堆中的垃圾收集
 
-![image-20210728113737855](https://gitee.com/cmz2000/album/raw/master/image/image-20210728113737855.png)
+![image-20210728113737855](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210728113737855.png)
 
 垃圾收集器可以对年轻代回收，也可以对老年代回收，甚至是全栈和方法区的回收
 
@@ -3380,7 +3396,7 @@ GC主要关注于 方法区 和堆中的垃圾收集
 
 当p的指针断开的时候，内部的引用形成一个循环，这就是循环引用，从而造成内存泄漏（引用计数算法中）。
 
-![image-20210728141454282](https://gitee.com/cmz2000/album/raw/master/image/image-20210728141454282.png)
+![image-20210728141454282](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210728141454282.png)
 
 #### 举例
 
@@ -3426,7 +3442,7 @@ Heap
 
 如果使用引用计数算法，那么这两个对象将会无法回收。而现在两个对象被回收了，说明Java使用的不是引用计数算法来进行标记的。
 
-![image-20210728141818109](https://gitee.com/cmz2000/album/raw/master/image/image-20210728141818109.png)
+![image-20210728141818109](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210728141818109.png)
 
 #### 小结
 
@@ -3454,7 +3470,7 @@ Python如何解决循环引用？
 
 #### 思路
 
-所谓"GCRoots”根集合就是一组必须活跃的引用。
+所谓"GC Roots”根集合就是一组必须活跃的引用。
 
 基本思路：
 
@@ -3463,7 +3479,7 @@ Python如何解决循环引用？
 - 如果目标对象没有任何引用链相连，则是不可达的，就意味着该对象己经死亡，可以标记为垃圾对象。
 - 在可达性分析算法中，只有能够被根对象集合直接或者间接连接的对象才是存活对象。
 
-![image-20210728201112294](https://gitee.com/cmz2000/album/raw/master/image/image-20210728201112294.png)
+![image-20210728201112294](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210728201112294.png)
 
 #### GC Roots
 
@@ -3481,7 +3497,7 @@ Python如何解决循环引用？
   - 基本数据类型对应的Class对象，一些常驻的异常对象（如：NullPointerException、OutOfMemoryError），系统类加载器。
 - 反映Java虚拟机内部情况的JMXBean、JVMTI中注册的回调、本地代码缓存等。
 
-![image-20210728202431688](https://gitee.com/cmz2000/album/raw/master/image/image-20210728202431688.png)
+![image-20210728202431688](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210728202431688.png)
 
 ##### 总结
 
@@ -3623,7 +3639,7 @@ obj is dead
 - **标记**：Collector从引用根节点开始遍历，**标记所有被引用的对象**。一般是在对象的Header中记录为可达对象。
 - **清除**：Collector对堆内存从头到尾进行线性的遍历，如果发现某个对象在其Header中没有标记为可达对象，则将其回收
 
-![image-20210729094700326](https://gitee.com/cmz2000/album/raw/master/image/image-20210729094700326.png)
+![image-20210729094700326](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729094700326.png)
 
 #### 什么是清除？
 
@@ -3649,11 +3665,11 @@ obj is dead
 
 将活着的内存空间分为两块，每次只使用其中一块，在垃圾回收时将正在使用的内存中的存活对象复制到未被使用的内存块中，之后清除正在使用的内存块中的所有对象，交换使用两个内存区（新生代的Survivor0和Survivor1使用此算法），最后完成垃圾回收。
 
-![image-20210729095643505](https://gitee.com/cmz2000/album/raw/master/image/image-20210729095643505.png)
+![image-20210729095643505](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729095643505.png)
 
 把可达的对象，直接复制到另外一个区域B中，复制完成后，A区就没有用了，里面的对象可以直接清除掉，新生代里面的幸存者区就用到了复制算法
 
-![image-20200712152029615](https://gitee.com/cmz2000/album/raw/master/image/image-20200712152029615.png)
+![image-20200712152029615](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200712152029615.png)
 
 #### 优点
 
@@ -3671,7 +3687,7 @@ obj is dead
 
 在新生代，对常规应用的垃圾回收，一次通常可以回收 70% - 99% 的内存空间。回收性价比很高。所以现在的商业虚拟机都是用这种收集算法回收新生代。
 
-![image-20210729101106015](https://gitee.com/cmz2000/album/raw/master/image/image-20210729101106015.png)
+![image-20210729101106015](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729101106015.png)
 
 ### 清除阶段：标记-压缩算法
 
@@ -3691,7 +3707,7 @@ obj is dead
 
 之后，清理边界外所有的空间。
 
-![image-20210729102250324](https://gitee.com/cmz2000/album/raw/master/image/image-20210729102250324.png)
+![image-20210729102250324](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729102250324.png)
 
 #### 和标记-清除的区别
 
@@ -3782,7 +3798,7 @@ obj is dead
 
 每一个小区间都独立使用，独立回收。这种算法的好处是可以控制一次回收多少个小区间。
 
-![image-20210729110758388](https://gitee.com/cmz2000/album/raw/master/image/image-20210729110758388.png)
+![image-20210729110758388](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729110758388.png)
 
 ## 相关概念
 
@@ -3915,7 +3931,7 @@ javadoc中对OutOfMemoryError的解释是：**没有空闲内存，并且垃圾�
 
 注意，这里的存储空间并不是指物理内存，而是指虚拟内存大小，这个虚拟内存大小取决于磁盘交换区设定的大小。
 
-![image-20210729122249273](https://gitee.com/cmz2000/album/raw/master/image/image-20210729122249273.png)
+![image-20210729122249273](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729122249273.png)
 
 Java使用可达性分析算法，最上面的数据不可达，就是需要被回收的。后期有一些对象不用了，按道理应该断开引用，但是存在一些链没有及时断开，从而导致没有办法被回收。
 
@@ -3956,7 +3972,7 @@ STW是JVM在后台自动发起和自动完成的。在用户不可见的情况�
   - 相较于并行的概念，单线程执行。
   - 如果内存不够，则程序暂停，启动JVM垃圾回收器进行垃圾回收。回收完，再启动程序的线程。
 
-![image-20210729135833296](https://gitee.com/cmz2000/album/raw/master/image/image-20210729135833296.png)
+![image-20210729135833296](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729135833296.png)
 
 并发和并行，在谈论垃圾收集器的上下文语境中，它们可以解释如下：
 
@@ -3966,7 +3982,7 @@ STW是JVM在后台自动发起和自动完成的。在用户不可见的情况�
 >
 > 如：CMS、G1
 
-![image-20210729135938155](https://gitee.com/cmz2000/album/raw/master/image/image-20210729135938155.png)
+![image-20210729135938155](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729135938155.png)
 
 ### 安全点与安全区域
 
@@ -4007,7 +4023,7 @@ Safepoint 机制保证了程序执行时，在不太长的时间内就会遇到�
 
 **这4种引用强度依次逐渐减弱**。除强引用外，其他3种引用均可以在java.lang.ref包中找到它们的身影。如下图，显示了这3种引用类型对应的类，开发人员可以在应用程序中直接使用它们。
 
-![image-20210729142304324](https://gitee.com/cmz2000/album/raw/master/image/image-20210729142304324.png)
+![image-20210729142304324](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729142304324.png)
 
 Reference子类中只有终结器引用是包内可见的，其他3种引用类型均为public，可以在应用程序中直接使用
 
@@ -4040,7 +4056,7 @@ StringBuffer str = new StringBuffer("hello strawberry");
 
 局部变量str指向StringBuffer实例所在堆空间，通过str可以操作该实例，那么str就是StringBuffer实例的强引用，对应内存结构：
 
-![image-20210729162427126](https://gitee.com/cmz2000/album/raw/master/image/image-20210729162427126.png)
+![image-20210729162427126](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210729162427126.png)
 
 如果此时，再运行一个赋值语句
 
@@ -4051,7 +4067,7 @@ StringBuffer str1 = str;
 
 对应的内存结构为：
 
-![image-20200712211732976](https://gitee.com/cmz2000/album/raw/master/image/image-20200712211732976.png)
+![image-20200712211732976](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20200712211732976.png)
 
 那么即使将 str = null; 原来堆中的对象实例也不会被回收，因为还有其它强引用指向该区域。
 
@@ -4149,3 +4165,56 @@ obj = null;
 在GC时，终结器引用入队。由Finalizer线程通过终结器引用找到被引用对象调用它的finalize()方法，第二次GC时才回收被引用的对象。
 
 ## 垃圾回收器
+
+### GC分类与性能指标
+
+垃圾收集器没有在规范中进行过多的规定，可以由不同的厂商、不同版本的JVM来实现。
+
+由于JDK的版本处于高速迭代过程中，因此Java发展至今已经衍生了众多的GC版本。
+
+从不同角度分析垃圾收集器，可以将GC分为不同的类型。
+
+#### GC分类
+
+**按线程数分**（垃圾回收线程数），可以分为串行垃圾回收器和并行垃圾回收器。
+
++ 串行回收指的是在同一时间段内只允许有一个CPU用于执行垃圾回收操作，此时工作线程被暂停，直至垃圾收集工作结束。
+
+  - 在诸如单CPU处理器或者较小的应用内存等硬件平台不是特别优越的场合，串行回收器的性能表现可以超过并行回收器和并发回收器。所以，串行回收默认被应用在客户端的Client模式下的JVM中
+  - 在并发能力比较强的CPU上，并行回收器产生的停顿时间要短于串行回收器。
+
++ 和串行回收相反，并行收集可以运用多个CPU同时执行垃圾回收，因此提升了应用的吞吐量，不过并行回收仍然与串行回收一样，采用独占式，使用了“stop-the-world”机制。
+
+**按工作模式分**，可以分为并发式垃圾回收器和独占式垃圾回收器。
+
+- 并发式垃圾回收器与应用程序线程交替工作，以尽可能减少应用程序的停顿时间。
+- 独占式垃圾回收器（Stop the world）一旦运行，就停止应用程序中的所有用户线程，直到垃圾回收过程完全结束。
+
+**按碎片处理方式分**，可分为压缩武垃圾回收器和非压缩式垃圾回收器。
+
+- 压缩式垃圾回收器会在回收完成后，对存活对象进行压缩整理，消除回收后的碎片。
+- 非压缩式的垃圾回收器不进行这步操作。
+
+**按工作的内存区间分**，又可分为年轻代垃圾回收器和老年代垃圾回收器。
+
+#### 性能指标
+
+
+
+### 不同的垃圾回收器概述
+
+### Serial回收器：串行回收
+
+### ParNew回收器：并行回收
+
+### Parallel回收器：吞吐量优先
+
+### CMS回收器：低延迟
+
+### G1回收器：区域化分代式
+
+### 垃圾回收器总结
+
+### GC日志分析
+
+### 垃圾回收器的新发展
