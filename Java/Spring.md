@@ -36,7 +36,7 @@ Maven仓库：[https://mvnrepository.com/search?q=spring](https://mvnrepository.
 
 ## 组成
 
-![image-20210922165208094](https://gitee.com/cmz2000/album/raw/master/image/image-20210922165208094.png)
+![image-20210922165208094](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210922165208094.png)
 
 # 2、IOC
 
@@ -104,11 +104,11 @@ public class MyTest {
 }
 ```
 
-![image-20210922174151644](https://gitee.com/cmz2000/album/raw/master/image/image-20210922174151644.png)
+![image-20210922174151644](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210922174151644.png)
 
 在我们之前的业务中，用户的需求可能会影响我们原来的代码，我们需要根据用户的需求去修改 `UserServiceImpl` 的源代码。如果程序代码量十分大，修改一次的成本代价十分昂贵！
 
-![image-20210923140421541](https://gitee.com/cmz2000/album/raw/master/image/image-20210923140421541.png)
+![image-20210923140421541](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210923140421541.png)
 
 我们使用一个 `set` 接口实现 `UserServiceImpl` 中的动态注入
 
@@ -146,18 +146,18 @@ public class MyTest {
 
 这种思想，从本质上解决了问题，程序员不用再去管理对象的创建了。系统的耦合性大大降低，可以更加专注的在业务的实现上。这就是 IOC 的原型。
 
-![image-20210923140445863](https://gitee.com/cmz2000/album/raw/master/image/image-20210923140445863.png)
+![image-20210923140445863](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210923140445863.png)
 
 ## IOC本质
 
 控制反转loC（Inversion of Control），是一种设计思想，DI（依赖注入）是实现loC的一种方法，也有人认为DI只是loC的另一种说法。没有loC的程序中，我们使用面向对象编程，对象的创建与对象间的依赖关系完全硬编码在程序中，对象的创建由程序自己控制，控制反转后将对象的创建转移给第三方，个人认为所谓控制反转就是：获得依赖对象的方式反转了。
 
-![image-20210923141329997](https://gitee.com/cmz2000/album/raw/master/image/image-20210923141329997.png)
+![image-20210923141329997](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210923141329997.png)
 
 + loC是Spring框架的核心内容，使用多种方式完美的实现了loC，可以使用XML配置，也可以使用注解，新版本的Spring也可以零配置实现loC。
 + Spring容器在初始化时先读取配置文件，根据配置文件或元数据创建与组织对象存入容器中，程序使用时再从loc容器中取出需要的对象。
 
-![image-20210923142352445](https://gitee.com/cmz2000/album/raw/master/image/image-20210923142352445.png)采用XML方式配置Bean的时候，采用XML方式配置Bean的时候，Bean的定义信息是和实现分离的，而采用注解的方式可以把两者合为一体，Bean的定义信息直接以注解的形式定义在实现类中，从而达到了零配置的目的。
+![image-20210923142352445](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210923142352445.png)采用XML方式配置Bean的时候，采用XML方式配置Bean的时候，Bean的定义信息是和实现分离的，而采用注解的方式可以把两者合为一体，Bean的定义信息直接以注解的形式定义在实现类中，从而达到了零配置的目的。
 
 官网上xml配置的框架为：
 
@@ -278,7 +278,23 @@ IOC是一种编程思想，由主动的编程变成被动的接收。一句话�
 Hello.java 代码如下：
 
 ```java
-package com.strawberry.pojo;public class Hello {    private String name;    public Hello() {        System.out.println("Hello的无参构造器");    }    public String getName() {        return name;    }    public void setName(String name) {        this.name = name;    }    public void show() {        System.out.println("name=" + name);    }}
+package com.strawberry.pojo;
+
+public class Hello {
+    private String name;
+    public Hello() {
+        System.out.println("Hello的无参构造器");
+    }
+    public String getName() {
+        return name;
+    }
+    public void setName(String name) {
+        this.name = name;
+    }
+    public void show() {
+        System.out.println("name=" + name);
+    }
+}
 ```
 
 在 beans.xml 中配置如下：
@@ -320,19 +336,29 @@ public Hello(String name) {
 ```
 
 ```xml
-<!-- 第一种，下标赋值 --><bean id="hello" class="com.strawberry.pojo.Hello">    <constructor-arg index="0" value="草莓汁"/></bean>
+<!-- 第一种，下标赋值 -->
+<bean id="hello" class="com.strawberry.pojo.Hello">
+    <constructor-arg index="0" value="草莓汁"/>
+</bean>
 ```
 
 #### 类型赋值
 
 ```xml
-<!-- 第二种，类型赋值 --><!-- 不建议使用，无法区分多个同类型的参数 --><bean id="hello" class="com.strawberry.pojo.Hello">    <constructor-arg type="java.lang.String" value="草莓汁"/></bean>
+<!-- 第二种，类型赋值 -->
+<!-- 不建议使用，无法区分多个同类型的参数 -->
+<bean id="hello" class="com.strawberry.pojo.Hello">
+    <constructor-arg type="java.lang.String" value="草莓汁"/>
+</bean>
 ```
 
 #### 参数名赋值（推荐）
 
 ```xml
-<!-- 第三种，通过构造器参数名赋值 --><bean id="hello" class="com.strawberry.pojo.Hello">    <constructor-arg name="name" value="草莓汁"/></bean>
+<!-- 第三种，通过构造器参数名赋值 -->
+<bean id="hello" class="com.strawberry.pojo.Hello">
+    <constructor-arg name="name" value="草莓汁"/>
+</bean>
 ```
 
 # 3、Spring配置
@@ -366,7 +392,7 @@ public Hello(String name) {
 
 一个正规的配置文件命名为applicationContext.xml，这是一个总的配置文件，项目中可以有多个配置文件，这样的好处是，可以由多个人编写，最后汇总，汇总到主配置文件applicationContext.xml
 
-![image-20210923205421682](https://gitee.com/cmz2000/album/raw/master/image/image-20210923205421682.png)
+![image-20210923205421682](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210923205421682.png)
 
 创建 ApplicationContext 实例的时候可以选用多个配置文件
 
@@ -377,7 +403,9 @@ ApplicationContext context = new ClassPathXmlApplicationContext("applicationCont
 或者只选择 applicationContext.xml 配置文件，将其他的配置文件导入 applicationContext.xml
 
 ```xml
-<import resource="beans.xml"/><import resource="beans2.xml"/><import resource="beans3.xml"/>
+<import resource="beans.xml"/>
+<import resource="beans2.xml"/>
+<import resource="beans3.xml"/>
 ```
 
 多个配置文件中存在相同内容的bean是没关系的（内容相同会被合并）
@@ -599,7 +627,7 @@ xmlns:p="http://www.springframework.org/schema/p"xmlns:c="http://www.springframe
 
 ### 单例 singleton
 
-<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210925145005670.png" alt="image-20210925145005670" style="zoom:80%;" />
+<img src="https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210925145005670.png" alt="image-20210925145005670" style="zoom:80%;" />
 
 默认机制为单例模式，也可以显式指定 scope
 
@@ -609,7 +637,7 @@ xmlns:p="http://www.springframework.org/schema/p"xmlns:c="http://www.springframe
 
 ### 原型 prototype
 
-<img src="https://gitee.com/cmz2000/album/raw/master/image/image-20210925150814868.png" alt="image-20210925150814868" style="zoom:80%;" />
+<img src="https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210925150814868.png" alt="image-20210925150814868" style="zoom:80%;" />
 
 每次从容器中 get 的时候，都会产生一个新对象
 
@@ -840,7 +868,7 @@ public class People {
 
 @Resource有很多参数
 
-![image-20210925225012760](https://gitee.com/cmz2000/album/raw/master/image/image-20210925225012760.png)
+![image-20210925225012760](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210925225012760.png)
 
 可以使用 name 和 type 参数显式指定使用哪一个或哪一类 bean
 
@@ -1080,7 +1108,7 @@ public class Config {
 + 静态代理
 + 动态代理
 
-![image-20210927165240871](https://gitee.com/cmz2000/album/raw/master/image/image-20210927165240871.png)
+![image-20210927165240871](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210927165240871.png)
 
 ### 静态代理
 
@@ -1176,7 +1204,7 @@ public class Client {
 
 #### 加深理解
 
-![image-20210927173515597](https://gitee.com/cmz2000/album/raw/master/image/image-20210927173515597.png)
+![image-20210927173515597](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20210927173515597.png)
 
 如果一条线已经做出来了，突然要在中间加一个功能，不能去修改原有的业务代码（这在公司中是大忌），只能在原有的基础上添加功能，通过代理，调用的是原有的功能，但是在调用原有的功能的同时能像上面的租房的例子一样，增加一些功能。
 
@@ -1192,8 +1220,98 @@ public class Client {
 - 基于类的动态代理：cglib
 - 基于java字节码实现：JavaAssist（现在用的比较多）
 
-需要了解两个类：Proxy，InvocationHandle
+需要了解两个类：Proxy，InvocationHandler
 
 - Proxy：代理
-- InvocationHandle：调用处理程序
+- InvocationHandler：调用处理程序
+
+>+ Proxy提供了创建动态代理类和实例的静态方法，它也是由这些方法创建的所有动态代理类的超类。
+>+ InvocationHandler是由代理实例的调用处理程序实现的接口。每个代理实例都有一个关联的调用处理程序。当在代理实例上调用方法时，方法调用将被编码并分派到其调用处理程序的invoke方法。
+
+自定义动态代理工具类：
+
+通过反射的方式，判断被代理对象的类型，处理代理实例
+
+```java
+// 用这个类来自动生成代理类
+public class ProxyInvocationHandler implements InvocationHandler {
+    // 被代理的接口
+    private Object target;
+
+    public void setTarget(Object target) {
+        this.target = target;
+    }
+
+    // 生成得到代理类
+    public Object getProxy() {
+        return Proxy.newProxyInstance(this.getClass().getClassLoader(), 
+                target.getClass().getInterfaces(), this);
+    }
+
+    // 处理代理示例，并返回结果
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        // 动态代理的本质，就是使用反射机制实现
+        Object res = method.invoke(target, args);
+        return res;
+    }
+}
+```
+
+使用示例：
+
+```java
+public class Client {
+    public static void main(String[] args) {
+        // 真实角色
+        UserServiceImpl userService = new UserServiceImpl();
+        // 代理角色，不存在
+        ProxyInvocationHandler pih = new ProxyInvocationHandler();
+        pih.setTarget(userService); // 设置要代理的对象
+        // 动态生成代理类
+        UserService proxy = (UserService) pih.getProxy();
+        
+        proxy.rent();
+    }
+}
+```
+
+动态代理的好处：
+
++ 包含静态代理的所有好处
++ 一个动态代理类代理的是一个接口，一般就是对应的一类业务
++ 一个动态代理类可以代理多个类，只要是实现了同一个接口即可
+
+## AOP
+
+### 什么是AOP
+
+AOP（Aspect Oriented Programming）意为：面向切面编程，通过预编译方式和运行期动态代理实现程序功能的统一维护的一种技术。AOP是OOP的延续，是软件开发中的一个热点，也是Spring框架中的一个重要内容，是函数式编程的一种衍生范型。利用AOP可以对业务逻辑的各个部分进行隔离，从而使得业务逻辑各部分之间的耦合度降低，提高程序的可重用性，同时提高了开发的效率。
+
+![image-20211004200247046](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20211004200247046.png)
+
+不改变原有的业务，增加功能
+
+### AOP在Spring中的作用
+
+==提供声明式事务；允许用户自定义切面==
+
++ 横切关注点：跨越应用程序多个模块的方法或功能。与我们业务逻辑无关的，但我们需要关注的部分，就是横切关注点。如日志，安全，缓存，事务等等 ...
++ 切面（Aspect）：横切关注点被模块化的特殊对象。它是一个类。
++ 通知（Advice）：切面必须要完成的工作。它是类中的一个方法。
++ 目标（Target）：被通知对象。
++ 代理（Proxy）：向目标对象应用通知之后创建的对象。
++ 切入点（PointCut）：切面通知执行的 “地点” 的定义。
++ 连接点（JointPoint）：与切入点匹配的执行点。
+
+![image-20211004200820080](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20211004200820080.png)
+
+SpringAOP中，通过Advice定义横切逻辑，支持五种类型的的advice
+
+![image-20211004201809576](https://strawberry-album.oss-cn-beijing.aliyuncs.com/image/image-20211004201809576.png)
+
+即 AOP 不改变原有代码的情况下，去增加新的功能
+
+### 使用Spring实现AOP
+
+导入依赖包：
 
